@@ -21,3 +21,9 @@
     overflow-y: scroll;
     overflow-x: hidden;
 }
+
+.subbrand {
+    font-size: 1.64rem;
+    line-height: 1.804rem;
+    margin: 0.82rem 0 0.656rem 0;
+}

@@ -53,7 +53,7 @@ function runExample() {
         var $chat = $('ul.chatbox');
         var dat = snap.val();
         var txt = dat.Body;
-        $('<li class="collection-item" /> ').attr('data-id', snap.key()).text(txt).appendTo($chat);
+        $('<li class="collection-item flow-text" /> ').attr('data-id', snap.key()).text(txt).appendTo($chat);
         $chat.scrollTop($chat.height());
     }
     
@@ -67,6 +67,7 @@ function runExample() {
        ref.unauth();
        $('#login-layer').show();
        $('#main-layer').hide();
+       emptyConsole();
     }
 
     // print results of write attempt so we can see if
@@ -94,16 +95,6 @@ function runExample() {
                 timestamp: Firebase.ServerValue.TIMESTAMP
             }, result);
         }
-    }
-        
-    // tell user how many characters they have entered
-    function countChars() {
-        var len = $(this).val().length;
-        if( len || !submitted ) {
-            var style = len >= 50 ? 'error' : 'note';
-            log(len + ' characters', style);
-        }
-        return true;
     }
 
     // print write results

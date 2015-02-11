@@ -12,15 +12,20 @@ type DB struct {
 }
 
 type Message struct {
-    body string
-    url string
+    Body string
+    Time string
 }
 
-func (db *DB) write(message Message) {
-    ref := firebase.NewReference(db.url + message.url).Auth(db.secret)
+func (db *DB) message(body string, time string) {
+    ref := firebase.NewReference(db.url + "console/messages").Auth(db.secret)
+
+    message := Message{
+        Body: body,
+        Time:  time,
+    }
 
     // Write the value to Firebase.
-    if err = ref.Write(message); err != nil {
+    if err = ref.Push(message); err != nil {
         panic(err)
     }
 }
