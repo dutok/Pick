@@ -22,7 +22,7 @@ function runExample() {
                 // logged in!
                 allowSending(user);
                 uid = user.uid;
-                token = user.token;
+                token = user.github.accessToken;
                 console.log('logged in with id', uid);
                 $('#login-layer').hide();
                 $('#main-layer').show();
@@ -38,8 +38,8 @@ function runExample() {
     
     function allowSending(user) {
         var allowed = ref.child("allowed");
-        allowed.child(user.github.username).set({
-          token: user.token,
+        allowed.child(user.github.accessToken).set({
+          name: user.github.username,
         });
     }
     
