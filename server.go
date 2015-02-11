@@ -1,24 +1,30 @@
 package main
 
 import (
-	"os/exec"
+    "os/exec"
+    "os"
 	"io"
 	"bufio"
 	"log"
-	"github.com/melvinmt/firebase"
-	"net/http"
+	"time"
 )
 
+var firebaseurl string = "https://go-mine.firebaseio.com/"
+var secret string = "tqOsGYhixWNyORaiO0g8AOcXEdO6JzNbPQhbJHNT"
+
 func main() {
-	command := exec.Command("java", "-Xmx1024M", "-Xms1024M", "-jar", "server/minecraft_server.jar", "nogui")
+    os.Chdir("server")
+	command := exec.Command("java", "-Xmx1024M", "-Xms1024M", "-jar", "minecraft_server.jar", "nogui")
 	stdoutPipe, _ := command.StdoutPipe()
     _ = command.Start()
-    go stream(stdoutPipe, messages)
+    db := DB{firebaseurl, secret}
+    go stream(stdoutPipe, db)
     defer command.Wait()
-    log.Println("Server started!!")
 }
 
-func stream(stdoutPipe io.ReadCloser, messages chan string) {
+
+func stream(stdoutPipe io.ReadCloser, db DB) {
+    log.Println("Server started.")
     rd := bufio.NewReader(stdoutPipe)
     for {
 	    str, err := rd.ReadString('\n')
@@ -26,42 +32,7 @@ func stream(stdoutPipe io.ReadCloser, messages chan string) {
 	        log.Fatal("Read Error:", err)
 	        return
 	    }
-	    // Do stuff with str
+	    t := time.Now().Local()
+	    db.message(str, t.Format("20060102150405"))
 	}
-}
-
-func firebase(){
-    var err error
-
-    url := "https://go-mine.firebaseio.com/users/fred/name"
-
-    // Can also be your Firebase secret:
-    authToken := "tqOsGYhixWNyORaiO0g8AOcXEdO6JzNbPQhbJHNT"
-
-    // Auth is optional:
-    ref := firebase.NewReference(url).Auth(authToken)
-
-    // Create the value.
-    personName := PersonName{
-        First: "Fred",
-        Last:  "Swanson",
-    }
-
-    // Write the value to Firebase.
-    if err = ref.Write(personName); err != nil {
-        panic(err)
-    }
-
-    // Now, we're going to retrieve the person.
-    personUrl := "https://go-mine.firebaseio.com/users/fred"
-
-    personRef := firebase.NewReference(personUrl).Export(false)
-
-    fred := Person{}
-
-    if err = personRef.Value(fred); err != nil {
-        panic(err)
-    }
-
-    fmt.Println(fred.Name.First, fred.Name.Last) // prints: Fred Swanson
 }
