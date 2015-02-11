@@ -7,6 +7,7 @@ import (
 	"bufio"
 	"log"
 	"time"
+	"net/http"
 )
 
 var firebaseurl string = "https://go-mine.firebaseio.com/"
@@ -19,6 +20,8 @@ func main() {
     _ = command.Start()
     db := DB{firebaseurl, secret}
     go stream(stdoutPipe, db)
+    os.Chdir("..")
+    httpServer()
     defer command.Wait()
 }
 
@@ -35,4 +38,11 @@ func stream(stdoutPipe io.ReadCloser, db DB) {
 	    t := time.Now().Local()
 	    db.message(str, t.Format("20060102150405"))
 	}
+}
+
+func httpServer() {
+    fs := http.FileServer(http.Dir("public"))
+    http.Handle("/", fs)
+    log.Println("HTTP server started on :9000!")
+    http.ListenAndServe(":9000", nil)
 }
