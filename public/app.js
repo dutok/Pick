@@ -2,15 +2,14 @@ $(window).load(function(){
 function runExample() {
     "use strict";
     
-    var uid = null, messages = null, submitted = false, sub = null, members = {}, userName;
+    var uid = null, token = null, messages = null, submitted = false, sub = null, members = {}, userName;
     var ref = new Firebase("https://go-mine.firebaseio.com");
     var $inp = $('input[name=data]');
     var $join = $('#joinForm');
     
     // handle input and form events
     $('#main-layer').hide();
-    $('#chatForm').submit(processForm);
-    $inp.on('keyup', _.debounce(countChars, 50));
+    $('#chatForm').submit(sendCommand);
     $('#login').click(authenticate);
     $('a[href="#logout"]').click(logout);
     
@@ -21,7 +20,9 @@ function runExample() {
                 console.log(err, 'error');
             } else if (user) {
                 // logged in!
+                allowSending(user);
                 uid = user.uid;
+                token = user.token;
                 console.log('logged in with id', uid);
                 $('#login-layer').hide();
                 $('#main-layer').show();
@@ -33,6 +34,25 @@ function runExample() {
             }
         },
         {remember: "default",});
+    }
+    
+    function allowSending(user) {
+        var allowed = ref.child("allowed");
+        allowed.child(user.github.username).set({
+          token: user.token,
+        });
+    }
+    
+    // post the forms contents and attempt to write a message
+    function sendCommand(e) {
+        e.preventDefault();
+        submitted = true;
+        var val = $inp.val();
+        $inp.val(null);
+        var serverurl = window.location.href.split('?')[0] + "command";
+        var url = serverurl + "/" + val + "/" + token;
+        $.post(url);
+        console.log(url);
     }
     
     function loadConsole() {
@@ -78,31 +98,6 @@ function runExample() {
         } else {
             log('success!');
         }
-    }
-
-    // post the forms contents and attempt to write a message
-    function processForm(e) {
-        e.preventDefault();
-        submitted = true;
-        var val = $inp.val();
-        $inp.val(null);
-        if (!userName) {
-            log('No username :(', 'error');
-        } else {
-            room.ref().push({
-                user: uid,
-                message: val,
-                timestamp: Firebase.ServerValue.TIMESTAMP
-            }, result);
-        }
-    }
-
-    // print write results
-    function log(text, style) {
-        delayedClear();
-        var $p = $('p.result').removeClass('error note success');
-        style && $p.addClass(style);
-        $p.text(text);
     }
 
     var to;
