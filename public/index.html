@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no"/>
+  <title>Pick - Advanced Minecraft server control panel in Go</title>
+
+  <!-- CSS  -->
+  <link href="css/materialize.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+  <link href="css/style.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+</head>
+<body>
+
+ <div id="main-layer">
+  
+  <nav class="light-blue lighten-1" role="navigation">
+    <div class="container">
+      <div class="nav-wrapper"><a id="logo-container" href="#" class="brand-logo">Pick</a>
+        <ul class="right">
+          <li><a href="#logout">Logout</a></li>
+        </ul>
+
+        <ul id="nav-mobile" class="side-nav">
+          <li><a href="#">Navbar Link</a></li>
+        </ul>
+        <a href="#" data-activates="nav-mobile" class="button-collapse"><i class="mdi-navigation-menu"></i></a>
+      </div>
+    </div>
+  </nav>
+  
+  <div class="container">
+   <h2>Console</h2>
+   <ul class="collection with-header chatbox">
+   </ul>
+  </div>
+            
+  
+ </div>
+
+
+  <div id="login-layer">
+    <div class="valign-wrapper login-push">
+      <a id="login" class="waves-effect waves-light btn-large"><i class="mdi-action-lock left"></i>Login</a>
+    </div>
+  </div>
+
+  <!--  Scripts-->
+  <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <script src="js/materialize.js"></script>
+  <script src="js/init.js"></script>
+  <script type='text/javascript' src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/2.4.1/lodash.min.js"></script>
+  <script type='text/javascript' src="https://cdn.firebase.com/js/client/2.0.4/firebase.js"></script>
+  <script type='text/javascript' src="app.js"></script>
+
+  </body>
+</html>

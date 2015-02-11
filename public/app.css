@@ -1,0 +1,54 @@
+ul.chatbox {
+    height: 100px;
+    background-color: #eee;
+    border: 1px solid #aaa;
+    padding: 10px;
+    border-radius: 10px;
+    overflow-y: auto;
+    word-break: break-all;
+    list-style-type: none;
+}
+p.result {
+    color: #00AA00;
+    font-weight: bold;
+}
+p.result.note {
+    color: gray;
+    font-weight: normal;
+    font-style: italic;
+}
+p.result.error {
+    color: red;
+}
+input[name="data"] {
+    width: 200px;
+}
+input[name="user"] {
+    width: 100px;
+}
+input {
+    font-size: 14px;
+    line-height: 16px;
+}
+#login-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background-color: white;
+    text-align: center;
+    padding-top: 50px;
+    z-index: 9999;
+}
+#joinForm {
+    display: none;
+}
+#chatForm {
+    display: none;   
+}
+#login {
+  font-size: 24px;
+  line-height: 30px;
+  padding: 10px;
+}
