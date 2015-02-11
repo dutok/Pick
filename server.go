@@ -24,14 +24,14 @@ func main() {
 	stdinPipe, _ := command.StdinPipe()
     _ = command.Start()
     db := DB{firebaseurl, secret}
-    go stream(stdoutPipe, stdinPipe, db)
+    go stream(stdoutPipe, db)
     os.Chdir("..")
-    httpServer()
+    httpServer(stdinPipe)
     defer command.Wait()
 }
 
 
-func stream(stdoutPipe io.ReadCloser, stdinPipe io.WriteCloser, db DB) {
+func stream(stdoutPipe io.ReadCloser, db DB) {
     log.Println("Server started.")
     rd := bufio.NewReader(stdoutPipe)
     for {
@@ -42,16 +42,22 @@ func stream(stdoutPipe io.ReadCloser, stdinPipe io.WriteCloser, db DB) {
 	    }
 	    t := time.Now().Local()
 	    db.message(str, t.Format("20060102150405"))
-	}
-	go func(){
-	    msg := <-messages
-	    io.WriteString(stdinPipe, msg + "\n")
-	}() //not working
+    }
 }
 
-func httpServer() {
+func httpServer(stdinPipe io.WriteCloser) {
     r := mux.NewRouter()
-    r.HandleFunc("/command/{command}/{token}", CommandHandler)
+    r.HandleFunc("/command/{command}/{token}", func(w http.ResponseWriter, r *http.Request) {
+         token := mux.Vars(r)["token"]
+         command := mux.Vars(r)["command"]
+         db := DB{firebaseurl, secret}
+         auth := db.check(token)
+         if (auth == 0){
+            log.Println("Invalid token.")
+         } else {
+            io.WriteString(stdinPipe, command + "\n")
+         }
+    })
     r.PathPrefix("/").Handler(http.FileServer(http.Dir("public")))
     http.Handle("/", r)
     log.Println("HTTP server started on :9000")
