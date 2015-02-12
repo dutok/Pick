@@ -2,7 +2,7 @@ $(window).load(function(){
 function runExample() {
     "use strict";
     
-    var uid = null, token = null, messages = null, submitted = false, sub = null, members = {}, userName;
+    var uid = null, email = null, username = null, avatar = null, token = null, messages = null, submitted = false, sub = null, members = {}, userName;
     var ref = new Firebase("https://go-mine.firebaseio.com");
     var $inp = $('input[name=data]');
     var $join = $('#joinForm');
@@ -23,6 +23,9 @@ function runExample() {
                 allowSending(user);
                 uid = user.uid;
                 token = user.github.accessToken;
+                avatar = user.github.cachedUserProfile.avatar_url;
+                username = user.github.username;
+                email = user.github.email;
                 console.log('logged in with id', uid);
                 $('#login-layer').hide();
                 $('#main-layer').show();
@@ -49,7 +52,7 @@ function runExample() {
         submitted = true;
         var val = $inp.val();
         $inp.val(null);
-        var serverurl = window.location.href.split('?')[0] + "command";
+        var serverurl = "http://" + window.location.host + "/command";
         var url = serverurl + "/" + val + "/" + token;
         $.post(url);
         console.log(url);

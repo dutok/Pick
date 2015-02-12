@@ -6,7 +6,16 @@
  * Made By MaterializeCSS.com
  */
 
-      
+header, main, footer {
+  padding-left: 240px;
+}
+
+@media only screen and (max-width : 992px) {
+    header, main, footer {
+      padding-left: 0;
+    }
+}
+  
 .icon-block {
   padding: 0 15px;
 }
@@ -26,4 +35,20 @@
     font-size: 1.64rem;
     line-height: 1.804rem;
     margin: 0.82rem 0 0.656rem 0;
+}
+
+.logo {
+    padding: 15px;
+    color: #29b6f6;
+    font-size: 2.92rem;
+    line-height: 3.212rem;
+    margin: 1.46rem 0 1.168rem 0;
+    border-bottom: 1px solid #ddd;
+}
+
+.menu {
+    background-color: #fff;
+    margin: 0.5rem 0 1rem 0;
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
 }

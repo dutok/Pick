@@ -11,13 +11,10 @@ import (
 	"github.com/gorilla/mux"
 )
 
-var messages chan string
-
 var firebaseurl string = "https://go-mine.firebaseio.com/"
 var secret string = "tqOsGYhixWNyORaiO0g8AOcXEdO6JzNbPQhbJHNT"
 
 func main() {
-    messages = make(chan string)
     os.Chdir("server")
 	command := exec.Command("java", "-Xmx1024M", "-Xms1024M", "-jar", "minecraft_server.jar", "nogui")
 	stdoutPipe, _ := command.StdoutPipe()
@@ -27,6 +24,7 @@ func main() {
     go stream(stdoutPipe, db)
     os.Chdir("..")
     httpServer(stdinPipe)
+    go filemanager()
     defer command.Wait()
 }
 
@@ -62,21 +60,4 @@ func httpServer(stdinPipe io.WriteCloser) {
     http.Handle("/", r)
     log.Println("HTTP server started on :9000")
     http.ListenAndServe(":9000", nil)
-}
-
-func CommandHandler(rw http.ResponseWriter, r *http.Request) {
-    token := mux.Vars(r)["token"]
-    command := mux.Vars(r)["command"]
-    db := DB{firebaseurl, secret}
-    auth := db.check(token)
-    if (auth == 0){
-        log.Println("Invalid token.")
-    } else {
-        sendCommand(command)
-        log.Println(command)
-    }
-}
-
-func sendCommand(command string){
-    messages <- command   
 }

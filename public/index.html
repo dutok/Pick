@@ -11,44 +11,46 @@
 </head>
 <body>
 
- <div id="main-layer">
+<div id="main-layer">
+  <main>
   
   <nav class="light-blue lighten-1" role="navigation">
+      <ul class="right hide-on-med-and-down">
+        <li><a href="#logout">Logout</a></li>
+      </ul>
+      <ul id="slide-out" class="side-nav fixed">
+        <li><div class="center-align valign-wrapper">
+            <span class="logo">Pick</span>
+        </div></li>
+        <li><a class="active" href="#console">Console</a></li>
+        <li><a href="#!">Second Sidebar Link</a></li>
+        <li class="hide-on-large-only"><a href="#logout">Logout</a></li>
+      </ul>
+      <a href="#" data-activates="slide-out" class="button-collapse">&nbsp; <i class="mdi-navigation-menu"></i></a>
+    </nav>
+    
     <div class="container">
-      <div class="nav-wrapper"><a id="logo-container" href="#" class="brand-logo">Pick <span class="subbrand hide-on-med-and-down">- Advanced Minecraft server control panel in Go</span></a>
-        <ul class="right hide-on-med-and-down">
-          <li><a href="#logout">Logout</a></li>
-        </ul>
-        <ul id="nav-mobile" class="side-nav">
-          <li><a href="#logout">Logout</a></li>
-        </ul>
-        <a href="#" data-activates="nav-mobile" class="button-collapse"><i class="mdi-navigation-menu"></i></a>
-      </div>
+       <h2>Console</h2>
+       <ul class="collection with-header chatbox">
+       </ul>
+        <div class="row">
+      <form id="chatForm">
+          <div class="input-field">
+            <i class="mdi-action-input prefix"></i>
+            <input name="data" id="icon_prefix" type="text" class="validate">
+            <label for="icon_prefix">Send command</label>
+          </div>
+      </form>
+     </div>
     </div>
-  </nav>
-  
-  <div class="container">
-   <h2>Console</h2>
-   <ul class="collection with-header chatbox">
-   </ul>
-    <div class="row">
-  <form id="chatForm">
-      <div class="input-field">
-        <i class="mdi-content-send prefix"></i>
-        <input name="data" id="icon_prefix" type="text" class="validate">
-        <label for="icon_prefix">Send command</label>
-      </div>
-  </form>
-</div>
-  </div>
-            
-  
+
+  </main>
  </div>
 
 
   <div id="login-layer">
     <div class="valign-wrapper login-push">
-      <a id="login" class="waves-effect waves-light btn-large"><i class="mdi-action-lock left"></i>Login</a>
+     <div><a id="login" class="waves-effect waves-light btn-large"><i class="mdi-action-lock left"></i>Login</a></div>
     </div>
   </div>
 
