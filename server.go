@@ -9,6 +9,7 @@ import (
 	"time"
 	"net/http"
 	"github.com/gorilla/mux"
+	"encoding/json"
 )
 
 var firebaseurl string = "https://go-mine.firebaseio.com/"
@@ -23,8 +24,8 @@ func main() {
     db := DB{firebaseurl, secret}
     go stream(stdoutPipe, db)
     os.Chdir("..")
+    go loadConfig()
     httpServer(stdinPipe)
-    go filemanager()
     defer command.Wait()
 }
 
@@ -51,13 +52,31 @@ func httpServer(stdinPipe io.WriteCloser) {
          db := DB{firebaseurl, secret}
          auth := db.check(token)
          if (auth == 0){
-            log.Println("Invalid token.")
+            log.Println("sendCommand: Invalid token.")
          } else {
             io.WriteString(stdinPipe, command + "\n")
          }
     })
+    r.HandleFunc("/config/{token}", getConfigs)
     r.PathPrefix("/").Handler(http.FileServer(http.Dir("public")))
     http.Handle("/", r)
     log.Println("HTTP server started on :9000")
     http.ListenAndServe(":9000", nil)
+}
+
+func getConfigs(w http.ResponseWriter, r *http.Request) {
+    token := mux.Vars(r)["token"]
+    db := DB{firebaseurl, secret}
+    auth := db.check(token)
+    if (auth == 0){
+        log.Println("getConfigs: Invalid token.")
+        } else {
+            configjson, err := json.Marshal(files)
+        if err != nil {
+            log.Println(err)
+        }
+        
+        w.Header().Set("Content-Type", "application/json")
+    	w.Write(configjson)
+    }
 }

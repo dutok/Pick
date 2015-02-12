@@ -1,30 +1,25 @@
 package main
  
 import (
-    "fmt"
+    "log"
     "os"
+    "strings"
     "path/filepath"
 )
- 
+
+var files []string
+
 func VisitFile(fp string, fi os.FileInfo, err error) error {
     if err != nil {
-        fmt.Println(err) // can't walk here,
+        log.Println(err) // can't walk here,
         return nil       // but continue walking elsewhere
     }
-    if !!fi.IsDir() {
-        return nil // not a file.  ignore.
-    }
-    matched, err := filepath.Match("*.mp3", fi.Name())
-    if err != nil {
-        fmt.Println(err) // malformed pattern
-        return err       // this is fatal.
-    }
-    if matched {
-        fmt.Println(fp)
+    if strings.HasSuffix(fp, ".json") || strings.HasSuffix(fp, ".yml") || strings.HasSuffix(fp, ".properties") || strings.HasSuffix(fp, ".txt") {
+        files = append(files, fp)
     }
     return nil
 }
-
-func filemanager() {
-    filepath.Walk("/server", VisitFile)
+ 
+func loadConfig() {
+    filepath.Walk("server", VisitFile)
 }
