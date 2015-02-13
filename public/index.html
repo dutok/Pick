@@ -14,7 +14,7 @@
 <div id="main-layer">
   <main>
   
-  <nav class="light-blue lighten-1" role="navigation">
+    <nav class="light-blue lighten-1" role="navigation">
       <ul class="right hide-on-med-and-down">
         <li><a href="#logout">Logout</a></li>
       </ul>
@@ -22,26 +22,38 @@
         <li><div class="center-align valign-wrapper">
             <span class="logo">Pick</span>
         </div></li>
-        <li><a class="active" href="#console">Console</a></li>
-        <li><a href="#!">Second Sidebar Link</a></li>
+        <a id="button-console" href="#console"><li>Console</li></a>
+        <a id="button-editor" href="#editor"><li>File Editor</li></a>
         <li class="hide-on-large-only"><a href="#logout">Logout</a></li>
       </ul>
       <a href="#" data-activates="slide-out" class="button-collapse">&nbsp; <i class="mdi-navigation-menu"></i></a>
     </nav>
     
-    <div class="container">
-       <h2>Console</h2>
-       <ul class="collection with-header chatbox">
-       </ul>
-        <div class="row">
-      <form id="chatForm">
-          <div class="input-field">
-            <i class="mdi-action-input prefix"></i>
-            <input name="data" id="icon_prefix" type="text" class="validate">
-            <label for="icon_prefix">Send command</label>
-          </div>
-      </form>
-     </div>
+    <div id="pages">
+        <div id="page-console">
+            <div class="container">
+            
+               <h2>Console</h2>
+               <ul class="collection with-header chatbox">
+               </ul>
+                <div class="row">
+                  <form id="chatForm">
+                      <div class="input-field">
+                        <i class="mdi-action-input prefix"></i>
+                        <input name="data" id="icon_prefix" type="text" class="validate">
+                        <label for="icon_prefix">Send command</label>
+                      </div>
+                  </form>
+                </div>
+            </div>
+        </div>
+        <div id="page-editor">
+            <div class="container">
+                  <h2>File Editor</h2>
+                  <ul id="files" class="collection with-header">
+                  </ul>
+             </div>
+        </div>
     </div>
 
   </main>
@@ -53,6 +65,18 @@
      <div><a id="login" class="waves-effect waves-light btn-large"><i class="mdi-action-lock left"></i>Login</a></div>
     </div>
   </div>
+  
+  <div id="editmodal" class="modal">
+    <div class="modal-content">
+      <h4 class="truncate" id="filetitle"></h4>
+      <br>
+        <textarea id="filecontents" rows="10"></textarea>
+        <input id="fileid" type="hidden">
+        <div class="modal-footer" name="id">
+          <a id="editsubmit" type="submit" name="submit" href="#" class="waves-effect waves-light btn modal-action modal-close">Update</a>
+        </div>
+     </div>
+   </div>
 
   <!--  Scripts-->
   <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>

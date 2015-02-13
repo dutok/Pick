@@ -52,3 +52,14 @@ header, main, footer {
     border: 1px solid #e0e0e0;
     border-radius: 2px;
 }
+
+.file {
+    text-decoration: none;
+    color: black;
+}
+
+textarea {
+  width: 100%;
+  height: 100%;;
+  background-color: transparent;
+}

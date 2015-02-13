@@ -3,13 +3,16 @@ package main
 import (
     "os/exec"
     "os"
-	"io"
+    "io"
+	"io/ioutil"
 	"bufio"
 	"log"
 	"time"
 	"net/http"
 	"github.com/gorilla/mux"
 	"encoding/json"
+	"strconv"
+	"strings"
 )
 
 var firebaseurl string = "https://go-mine.firebaseio.com/"
@@ -57,7 +60,9 @@ func httpServer(stdinPipe io.WriteCloser) {
             io.WriteString(stdinPipe, command + "\n")
          }
     })
-    r.HandleFunc("/config/{token}", getConfigs)
+    r.HandleFunc("/configs/{token}", getConfigs)
+    r.HandleFunc("/config/{id}/{token}", getConfig)
+    r.HandleFunc("/update/{id}/{content}/{token}", setConfig)
     r.PathPrefix("/").Handler(http.FileServer(http.Dir("public")))
     http.Handle("/", r)
     log.Println("HTTP server started on :9000")
@@ -78,5 +83,51 @@ func getConfigs(w http.ResponseWriter, r *http.Request) {
         
         w.Header().Set("Content-Type", "application/json")
     	w.Write(configjson)
+    }
+}
+
+func getConfig(w http.ResponseWriter, r *http.Request) {
+    var i int
+    token := mux.Vars(r)["token"]
+    id := mux.Vars(r)["id"]
+    db := DB{firebaseurl, secret}
+    auth := db.check(token)
+    if (auth == 0){
+        log.Println("getConfig: Invalid token.")
+    } else {
+        i, _ = strconv.Atoi(id)
+        file := files[i]
+        var buf, err = ioutil.ReadFile(file)
+        if err != nil {
+            log.Println(err)   
+        }
+        
+        splitstring := strings.SplitAfter(file, "/")
+        filename := splitstring[len(splitstring)-1]
+        
+        w.Header().Set("Content-Disposition", "attachment; filename=" + filename)
+        w.Header().Set("Content-Type", "text/plain")
+    	w.Write(buf)
+    }
+}
+
+func setConfig(w http.ResponseWriter, r *http.Request) {
+    var i int
+    token := mux.Vars(r)["token"]
+    id := mux.Vars(r)["id"]
+    content := mux.Vars(r)["content"]
+    db := DB{firebaseurl, secret}
+    auth := db.check(token)
+    if (auth == 0){
+        log.Println("setConfig: Invalid token.")
+    } else {
+        i, _ = strconv.Atoi(id)
+        file := files[i]
+        err := ioutil.WriteFile(file, []byte(content), 0644)
+        if err != nil {
+            log.Println(err)
+            w.Write([]byte("There was an error updating the file."))
+        }
+        w.Write([]byte("The file was updated successfully."))
     }
 }
