@@ -2,7 +2,7 @@ $(window).load(function(){
 function runExample() {
     "use strict";
     
-    var uid = null, email = null, username = null, avatar = null, token = null, messages = null, submitted = false, sub = null, members = {}, userName;
+    var uid = null, email = null, username = null, avatar = null, token = null, messages = null, sub = null, members = {}, userName;
     var ref = new Firebase("https://go-mine.firebaseio.com");
     var $inp = $('input[name=data]');
     var $join = $('#joinForm');
@@ -72,15 +72,10 @@ function runExample() {
     }
     
     function loadConsole() {
-        emptyConsole();
+        $('ul.chatbox').empty();
         messages = ref.child('console/messages').limitToLast(30);
         messages.on('child_added', newMessage);
         messages.on('child_removed', dropMessage);   
-    }
-    
-    function emptyConsole() {
-        $join.detach();
-        return $('ul.chatbox').empty();
     }
     
     // create a new message in the DOM after it comes
@@ -104,32 +99,6 @@ function runExample() {
        $('#login-layer').show();
        $('#main-layer').hide();
     }
-
-    // print results of write attempt so we can see if
-    // rules allowed or denied the attempt
-    function result(err) {
-        if (err) {
-            log(err.code, 'error');
-        } else {
-            log('success!');
-        }
-    }
-
-    var to;
-
-    // clear write results after 5 seconds
-    function delayedClear() {
-        to && clearTimeout(to);
-        to = setTimeout(clearNow, 5000);
-    }
-
-    // clear write results now
-    function clearNow() {
-        $('p.result').text('');
-        to && clearTimeout(to);
-        to = null;
-        submitted = false;
-    }
     
     // page functions
 
@@ -152,13 +121,11 @@ function runExample() {
      // post the forms contents and attempt to write a message
     function sendCommand(e) {
         e.preventDefault();
-        submitted = true;
         var val = $inp.val();
         $inp.val(null);
         var serverurl = "http://" + window.location.host + "/command";
         var url = serverurl + "/" + val + "/" + token;
         $.post(url);
-        console.log(url);
     }
     
     function loadConfigs() {
@@ -168,7 +135,7 @@ function runExample() {
         $.getJSON( "/configs/" + token, function( data ) {
           var items = [];
           $.each( data, function( key, val ) {
-            $files.append( "<li class='collection-item'><div class='truncate flow-text'>"+ val +"<a id='file"+ key +"' href='#editor' class='secondary-content'><i class='secondary-content mdi-editor-mode-edit'></i></a></div></li>" );
+            $files.append("<li><div class='collapsible-header flow-text truncate'><a class='file' id='file"+ key +"' href='#editor'><i class='mdi-editor-insert-drive-file'></i>"+ val +"</a></div></li>");
             $('#file' + key).click(function(){
                 editFile(val, key);
             });

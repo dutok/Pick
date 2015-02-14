@@ -1,11 +1,11 @@
 package main
 
 import (
-    "github.com/melvinmt/firebase"
     "log"
     "net/http"
-    "os"
     "io/ioutil"
+    "encoding/json"
+    "bytes"
 )
 
 var err error
@@ -17,34 +17,41 @@ type DB struct {
 
 type Message struct {
     Body string
-    Time string
 }
 
-func (db *DB) message(body string, time string) {
-    ref := firebase.NewReference(db.url + "console/messages").Auth(db.secret)
-
-    message := Message{
-        Body: body,
-        Time:  time,
+func (db *DB) message(msg string) {
+    url := db.url + "console/messages.json?auth=" + secret
+    message := Message{Body: msg}
+    jsonmessage, err := json.Marshal(message)
+    if err != nil {
+        log.Println(err)
     }
+    req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonmessage))
+    req.Close = true
 
-    // Write the value to Firebase.
-    if err = ref.Push(message); err != nil {
-        panic(err)
+    req.Header.Set("Content-Type", "application/json")
+    
+    client := &http.Client{}
+    resp, err := client.Do(req)
+    if err != nil {
+        resp, err = client.Do(req)
+        if err != nil {
+            panic(err)
+        }
     }
+    
+    defer resp.Body.Close()
 }
 
 func (db *DB) check(token string) int {
-    response, err := http.Get(db.url + "allowed/" + token + ".json")
+    response, err := http.Get(db.url + "allowed/" + token + ".json?auth=" + secret)
+    defer response.Body.Close()
     if err != nil {
         log.Printf("%s", err)
-        os.Exit(1)
     } else {
-        defer response.Body.Close()
         contents, err := ioutil.ReadAll(response.Body)
         if err != nil {
             log.Printf("%s", err)
-            os.Exit(1)
         }
         
         if string(contents) == "null" {
