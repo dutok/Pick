@@ -140,18 +140,12 @@ function runExample() {
         $.getJSON( "/configs/" + token, function( data ) {
           var items = [];
           $.each( data, function( key, val ) {
-            $files.append("<li><div class='collapsible-header flow-text truncate'><a class='file' id='file"+ key +"' href='#editor'><i class='mdi-editor-insert-drive-file'></i>"+ val +"</a></div></li>");
+            $files.append("<li><div class='file-name collapsible-header flow-text truncate'><a class='file' id='file"+ key +"' href='#editor'><i class='mdi-editor-insert-drive-file'></i>"+ val +"</a></div></li>");
             $('#file' + key).click(function(){
                 editFile(val, key);
             });
           });
         });
-        
-        var options = {
-            valueNames: [ 'name', 'city' ]
-        };
-        
-        var hackerList = new List('hacker-list', options);
     }
     
     function editFile(name, id) {

@@ -67,3 +67,12 @@ textarea {
 ul.side-nav.fixed li:hover, ul.side-nav.fixed .active {
     background-color: #ddd;
 }
+
+ul.side-nav.fixed i {
+    width: 2rem;
+    font-size: 1.6rem;
+    display: block;
+    float: left;
+    text-align: center;
+    margin-right: 1rem;
+}

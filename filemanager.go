@@ -15,7 +15,11 @@ func VisitFile(fp string, fi os.FileInfo, err error) error {
         return nil       // but continue walking elsewhere
     }
     if strings.HasSuffix(fp, ".json") || strings.HasSuffix(fp, ".yml") || strings.HasSuffix(fp, ".properties") || strings.HasSuffix(fp, ".txt") {
-        files = append(files, fp)
+        if strings.HasPrefix(fp, "server/world/stats") {
+            return nil
+        } else {
+            files = append(files, fp)
+        }
     }
     return nil
 }

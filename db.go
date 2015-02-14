@@ -22,7 +22,7 @@ func (db *DB) message(msg string) {
     url := db.url + "console/messages.json?auth=" + secret
     message := Message{Body: msg}
     jsonmessage, err := json.Marshal(message)
-    check(err)
+    check(err, "Database")
     req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonmessage))
     req.Close = true
 
