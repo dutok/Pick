@@ -50,6 +50,7 @@ function runExample() {
     }
     
     function showMain(){
+        loadConsole();
         $('#login-layer').hide();
         $('#main-layer').show();
         if(window.location.href.indexOf("editor") > -1) {
@@ -72,7 +73,7 @@ function runExample() {
     }
     
     function loadConsole() {
-        $('ul.chatbox').empty();
+        $('#chatbox').empty();
         messages = ref.child('console/messages').limitToLast(30);
         messages.on('child_added', newMessage);
         messages.on('child_removed', dropMessage);   
@@ -81,7 +82,7 @@ function runExample() {
     // create a new message in the DOM after it comes
     // in from the server (via child_added)
     function newMessage(snap) {
-        var $chat = $('ul.chatbox');
+        var $chat = $('#chatbox');
         var dat = snap.val();
         var txt = dat.Body;
         $('<li class="collection-item flow-text" /> ').attr('data-id', snap.key()).text(txt).appendTo($chat);
@@ -111,7 +112,6 @@ function runExample() {
     function pageConsole() {
         $('#page-console').show();
         $('#page-console').siblings().hide();
-        loadConsole();
     }
     
     function launchUpload() {
