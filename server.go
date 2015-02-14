@@ -14,6 +14,7 @@ type Server struct {
     Stdoutpipe io.ReadCloser
     Stdinpipe io.WriteCloser
     Status bool
+    Cmdchan chan string
 }
 
 var currentserver Server
@@ -25,22 +26,27 @@ func newServer(db DB) Server {
 	check(err, "Minecraft server")
 	stdinPipe, err := command.StdinPipe()
 	check(err, "Minecraft server")
-	server := Server{command, db, stdoutPipe, stdinPipe, false}
+	cmdchan := make(chan string)
+	server := Server{command, db, stdoutPipe, stdinPipe, false, cmdchan}
 	return server
 }
 
 func startServer(server Server) {
+    if server.Command.Process != nil {
+        server.Command.Process.Kill()
+    }
     server.Command.Start()
 	log.Println("Minecraft server: STARTED")
 	server.Status = true
 	
 	go func() {
     	for {
-    		select {
-        		// Read from our channel then write it to the servers stdin
-        		case cmd := <-mcStdIn:
-        			io.WriteString(server.Stdinpipe, cmd+"\n")
-    		}
+        		select {
+            		case cmd := <-server.Cmdchan:
+            		    if server.Status {
+            			    io.WriteString(server.Stdinpipe, cmd+"\n")
+            		    }
+        		}
     	}
 	}()
 	
@@ -66,10 +72,14 @@ func startServer(server Server) {
 }
 
 func (server *Server) stop() {
-    cmd := "stop"
-    mcStdIn <- cmd
+    server.sendCommand("stop")
 }
 
 func (server *Server) status() bool {
     return server.Status  
+}
+
+func (server *Server) sendCommand(command string) {
+    log.Println("command recieved: " + command)
+	server.Cmdchan <- command
 }

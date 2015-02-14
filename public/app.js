@@ -132,6 +132,7 @@ function runExample() {
         var serverurl = "http://" + window.location.host + "/command";
         var url = serverurl + "/" + val + "/" + token;
         $.post(url);
+        console.log(url)
     }
     
     function loadConfigs() {
