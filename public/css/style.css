@@ -63,3 +63,7 @@ textarea {
   height: 100%;;
   background-color: transparent;
 }
+
+ul.side-nav.fixed li:hover, ul.side-nav.fixed .active {
+    background-color: #ddd;
+}

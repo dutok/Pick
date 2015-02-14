@@ -9,8 +9,6 @@ import (
     "time"
 )
 
-var err error
-
 type DB struct {
     url string
     secret string
@@ -24,9 +22,7 @@ func (db *DB) message(msg string) {
     url := db.url + "console/messages.json?auth=" + secret
     message := Message{Body: msg}
     jsonmessage, err := json.Marshal(message)
-    if err != nil {
-        log.Println(err)
-    }
+    check(err)
     req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonmessage))
     req.Close = true
 

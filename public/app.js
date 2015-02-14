@@ -51,6 +51,7 @@ function runExample() {
     
     function showMain(){
         loadConsole();
+        loadConfigs();
         $('#login-layer').hide();
         $('#main-layer').show();
         if(window.location.href.indexOf("editor") > -1) {
@@ -106,12 +107,17 @@ function runExample() {
     function pageEditor() {
         $('#page-editor').show();
         $('#page-editor').siblings().hide();
-        loadConfigs();
+        
+        $('#button-editor').addClass("active");
+        $('#button-editor').siblings().removeClass("active");
     }
     
     function pageConsole() {
         $('#page-console').show();
         $('#page-console').siblings().hide();
+        
+        $('#button-console').addClass("active");
+        $('#button-console').siblings().removeClass("active");
     }
     
     function launchUpload() {
@@ -131,7 +137,6 @@ function runExample() {
     function loadConfigs() {
         var $files = $('#files');
         $files.empty();
-        console.log(token)
         $.getJSON( "/configs/" + token, function( data ) {
           var items = [];
           $.each( data, function( key, val ) {
@@ -141,6 +146,12 @@ function runExample() {
             });
           });
         });
+        
+        var options = {
+            valueNames: [ 'name', 'city' ]
+        };
+        
+        var hackerList = new List('hacker-list', options);
     }
     
     function editFile(name, id) {

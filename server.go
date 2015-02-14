@@ -16,26 +16,31 @@ import (
 )
  
 var firebaseurl string = "https://go-mine.firebaseio.com/"
-var secret string = "tqOsGYhixWNyORaiO0g8AOcXEdO6JzNbPQhbJHNT"
+var secret string = "IcVM9hRKCqz4GTkUpiHphbNBHg7y4hW62FJTM5bz"
  
 var mcStdIn chan string
  
 func init() {
 	mcStdIn = make(chan string)
 }
+
+var err error
  
 func main() {
     runtime.GOMAXPROCS(2)
 	os.Chdir("server")
 	command := exec.Command("java", "-Xmx1024M", "-Xms1024M", "-jar", "minecraft_server.jar", "nogui")
-	stdoutPipe, _ := command.StdoutPipe()
-	stdinPipe, _ := command.StdinPipe()
-	_ = command.Start()
+	stdoutPipe, err := command.StdoutPipe()
+	check(err)
+	stdinPipe, err := command.StdinPipe()
+	check(err)
+	err = command.Start()
+	check(err)
 	db := DB{firebaseurl, secret}
 	go stream(stdoutPipe, db)
 	os.Chdir("..")
 	loadConfig()
- 
+	
 	// A for will block so put it in a goroutine
 	go func() {
 		for {
@@ -48,7 +53,7 @@ func main() {
 		}
 	}()
 	defer command.Wait()
-	httpServer()
+	httpServer(db)
 }
  
 func stream(stdoutPipe io.ReadCloser, db DB) {
@@ -56,20 +61,17 @@ func stream(stdoutPipe io.ReadCloser, db DB) {
 	rd := bufio.NewReader(stdoutPipe)
 	for {
 		str, err := rd.ReadString('\n')
-		if err != nil {
-			log.Fatal("Read Error:", err)
-		}
+		fatalcheck(err)
 		
 		db.message(str)
 	}
 }
  
-func httpServer() {
+func httpServer(db DB) {
 	r := mux.NewRouter()
 	r.HandleFunc("/command/{command}/{token}", func(w http.ResponseWriter, r *http.Request) {
 		token := mux.Vars(r)["token"]
 		command := mux.Vars(r)["command"]
-		db := DB{firebaseurl, secret}
 		auth := db.check(token)
 		if auth == 0 {
 			log.Println("sendCommand: Invalid token.")
@@ -77,18 +79,23 @@ func httpServer() {
 			mcStdIn <- command
 		}
 	})
-	r.HandleFunc("/configs/{token}", getConfigs)
-	r.HandleFunc("/config/{id}/{token}", getConfig)
-	r.HandleFunc("/update/{id}/{content}/{token}", setConfig)
+	r.HandleFunc("/configs/{token}", func(w http.ResponseWriter, r *http.Request){
+	    getConfigs(w,r,db)   
+	})
+	r.HandleFunc("/config/{id}/{token}", func(w http.ResponseWriter, r *http.Request){
+	    getConfig(w,r,db)   
+	})
+	r.HandleFunc("/update/{id}/{content}/{token}", func(w http.ResponseWriter, r *http.Request){
+	    setConfig(w,r,db)   
+	})
 	r.PathPrefix("/").Handler(http.FileServer(http.Dir("public")))
 	http.Handle("/", r)
 	log.Println("HTTP server started on :9000")
 	go http.ListenAndServe(":9000", nil)
 }
  
-func getConfigs(w http.ResponseWriter, r *http.Request) {
+func getConfigs(w http.ResponseWriter, r *http.Request, db DB) {
 	token := mux.Vars(r)["token"]
-	db := DB{firebaseurl, secret}
 	auth := db.check(token)
 	if auth == 0 {
 		log.Println("getConfigs: Invalid token.")
@@ -103,21 +110,19 @@ func getConfigs(w http.ResponseWriter, r *http.Request) {
 	}
 }
  
-func getConfig(w http.ResponseWriter, r *http.Request) {
+func getConfig(w http.ResponseWriter, r *http.Request, db DB) {
 	var i int
 	token := mux.Vars(r)["token"]
 	id := mux.Vars(r)["id"]
-	db := DB{firebaseurl, secret}
 	auth := db.check(token)
 	if auth == 0 {
 		log.Println("getConfig: Invalid token.")
 	} else {
-		i, _ = strconv.Atoi(id)
+		i, err = strconv.Atoi(id)
+		check(err)
 		file := files[i]
 		var buf, err = ioutil.ReadFile(file)
-		if err != nil {
-			log.Println(err)
-		}
+		check(err)
  
 		splitstring := strings.SplitAfter(file, "/")
 		filename := splitstring[len(splitstring)-1]
@@ -128,12 +133,11 @@ func getConfig(w http.ResponseWriter, r *http.Request) {
 	}
 }
  
-func setConfig(w http.ResponseWriter, r *http.Request) {
+func setConfig(w http.ResponseWriter, r *http.Request, db DB) {
 	var i int
 	token := mux.Vars(r)["token"]
 	id := mux.Vars(r)["id"]
 	content := mux.Vars(r)["content"]
-	db := DB{firebaseurl, secret}
 	auth := db.check(token)
 	if auth == 0 {
 		log.Println("setConfig: Invalid token.")
@@ -141,10 +145,19 @@ func setConfig(w http.ResponseWriter, r *http.Request) {
 		i, _ = strconv.Atoi(id)
 		file := files[i]
 		err := ioutil.WriteFile(file, []byte(content), 0644)
-		if err != nil {
-			log.Println(err)
-			w.Write([]byte("There was an error updating the file."))
-		}
+		check(err)
 		w.Write([]byte("The file was updated successfully."))
 	}
+}
+
+func check(err error) {
+    if err != nil {
+        log.Println(err)
+    }
+}
+
+func fatalcheck(err error) {
+    if err != nil {
+        log.Fatal(err)
+    }
 }
