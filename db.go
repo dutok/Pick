@@ -6,6 +6,7 @@ import (
     "io/ioutil"
     "encoding/json"
     "bytes"
+    "time"
 )
 
 var err error
@@ -34,9 +35,10 @@ func (db *DB) message(msg string) {
     client := &http.Client{}
     resp, err := client.Do(req)
     if err != nil {
+        time.Sleep(time.Second)
         resp, err = client.Do(req)
         if err != nil {
-            panic(err)
+            log.Println(err)
         }
     }
     
