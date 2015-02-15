@@ -64,7 +64,7 @@ textarea {
   background-color: transparent;
 }
 
-ul.side-nav.fixed li:hover, ul.side-nav.fixed .active {
+ul.side-nav.fixed a:hover, ul.side-nav.fixed .active {
     background-color: #ddd;
 }
 
