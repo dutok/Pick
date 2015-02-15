@@ -166,12 +166,12 @@ function runExample() {
     }
     
     function start() {
-        $.get( "/server/start", function( data ) {});
+        $.get( "/server/start/" + token, function( data ) {});
         toast("Server started!", 4000);
     }
     
     function stop() {
-        $.get( "/server/stop", function( data ) {});
+        $.get( "/server/stop/" + token, function( data ) {});
         toast("Server stopped!", 4000);
     }
     
@@ -196,7 +196,7 @@ function runExample() {
             $('#status').addClass("red").removeClass("green");
           } else {
              $('#statustext').text("Online");
-             $('#status').addClass("green").removeClass("re");
+             $('#status').addClass("green").removeClass("red");
           }
         });
     }
