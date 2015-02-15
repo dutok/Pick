@@ -22,7 +22,7 @@
         <li><div class="center-align valign-wrapper">
             <span class="logo">Pick</span>
         </div></li>
-        <a id="button-console" href="#dashboard"><li><i class="tiny mdi-action-dashboard"></i> Dashboard</li></a>
+        <a id="button-dashboard" href="#dashboard"><li><i class="tiny mdi-action-dashboard"></i> Dashboard</li></a>
         <a id="button-console" href="#console"><li><i class="tiny mdi-action-question-answer"></i> Console</li></a>
         <a id="button-editor" href="#editor"><li><i class="mdi-file-folder"></i> File Editor</li></a>
         <li class="hide-on-large-only"><a href="#logout">Logout</a></li>
@@ -54,6 +54,57 @@
                     <ul id="files" class="collapsible list" data-collapsible="accordion">
                     </ul>
              </div>
+        </div>
+        <div id="page-dashboard">
+            <div class="container">
+             <h2>Dashboard</h2>
+             <div class="row">
+              <div class="col s12 m6">
+                <div class="card-panel teal">
+                    <div class="card-content white-text">
+                      <span id="players" class="card-title flow-text"></span>
+                        <div class="progress">
+                            <div id="playerbar" class="determinate"></div>
+                        </div>
+                    </div>
+                </div>
+              </div>
+              <div class="col s12 m6">
+                <div class="card-panel blue darken-2">
+                    <div class="card-content white-text">
+                      <span id="memory" class="card-title flow-text"></span>
+                        <div class="progress">
+                            <div id="memorybar" class="determinate"></div>
+                        </div>
+                    </div>
+                </div>
+              </div>
+             </div>
+             <div class="row">
+               <div class="col s12 m6">
+                <ul class="collection with-header flow-text">
+                    <li class="collection-header"><h4>Server details</h4></li>
+                    <li href="#!" class="collection-item">Version<span id="version" class="badge"></span></li>
+                    <li href="#!" class="collection-item">Map<span id="map" class="badge"></span></li>
+                    <li href="#!" class="collection-item">Game ID<span id="gameid" class="badge"></span></li>
+                    <li href="#!" class="collection-item">Game type<span id="gametype" class="badge"></span></li>
+                    <li href="#!" class="collection-item">MOTD<span id="motd" class="badge"></span></li>
+                </ul>
+               </div>
+               <div class="col s12 m6">
+                  <div id="status" class="card darken-4">
+                    <div class="card-content white-text">
+                      <p class="card-title">Server status</p>
+                      <p class="flow-text" id="statustext"></p>
+                    </div>
+                    <div class="card-action">
+                      <a id="button-start" href="#">Start</a>
+                      <a id="button-stop" href='#'>Stop</a>
+                    </div>
+                  </div>
+               </div>
+             </div>
+            </div>
         </div>
     </div>
 

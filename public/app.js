@@ -21,6 +21,9 @@ function runExample() {
     $('a[href="#logout"]').click(logout);
     $('#button-editor').click(pageEditor);
     $('#button-console').click(pageConsole);
+    $('#button-dashboard').click(pageDashboard);
+    $('#button-start').click(start);
+    $('#button-stop').click(stop);
     $('#editsubmit').click(updateFile);
     
     function authenticate(e) {
@@ -52,12 +55,15 @@ function runExample() {
     function showMain(){
         loadConsole();
         loadConfigs();
+        loadDashboard();
         $('#login-layer').hide();
         $('#main-layer').show();
         if(window.location.href.indexOf("editor") > -1) {
            pageEditor();
+        } else if(window.location.href.indexOf("console") > -1) {
+           pageConsole();
         } else {
-            pageConsole();
+            pageDashboard();
         }
     }
     
@@ -120,6 +126,16 @@ function runExample() {
         $('#button-console').siblings().removeClass("active");
     }
     
+    function pageDashboard() {
+        $('#page-dashboard').show();
+        $('#page-dashboard').siblings().hide();
+        
+        $('#button-dashboard').addClass("active");
+        $('#button-dashboard').siblings().removeClass("active");
+        
+        loadDashboard();
+    }
+    
     function launchUpload() {
         $('#modal1').openModal();
     }
@@ -149,6 +165,42 @@ function runExample() {
         });
     }
     
+    function start() {
+        $.get( "/server/start", function( data ) {});
+        toast("Server started!", 4000);
+    }
+    
+    function stop() {
+        $.get( "/server/stop", function( data ) {});
+        toast("Server stopped!", 4000);
+    }
+    
+    function loadDashboard() {
+        $.getJSON( "/server", function( data ) {
+          console.log(data);
+          $('#playerbar').css("width", data.NumPlayers / data.MaxPlayers * 100 + "%");
+          $('#players').text(data.NumPlayers + "/" + data.MaxPlayers + " players online");
+          
+          var mempercent = data.Memory.Used / data.Memory.Total * 100
+          $('#memorybar').css("width", data.Memory.Used / data.Memory.Total * 100 + "%");
+          $('#memory').text(Math.floor(mempercent) + "% of RAM used");
+          
+          $('#version').text(data.Version);
+          $('#map').text(data.Map);
+          $('#gameid').text(data.GameId);
+          $('#gametype').text(data.GameType);
+          $('#motd').text(data.Motd);
+          
+          if (data.Status === null || data.status === 0) {
+            $('#statustext').text("Offline");
+            $('#status').addClass("red").removeClass("green");
+          } else {
+             $('#statustext').text("Online");
+             $('#status').addClass("green").removeClass("re");
+          }
+        });
+    }
+    
     function editFile(name, id) {
         var $modal = $('#editmodal');
         $modal.openModal();
@@ -161,7 +213,7 @@ function runExample() {
         console.log("Updated!");
         var id = $('#fileid').val();
         var content = $('#filecontents').val();
-        var newcontent = escape(content);
+        var newcontent = escape(content.replace(/\//g, "&#47;"));
         var url = "/update/" + id + "/" + newcontent + "/" + token;
         console.log(url);
         $.post( url, function( data ) {

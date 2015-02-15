@@ -9,6 +9,8 @@ import (
     "time"
 )
 
+var lastMessage string
+
 type DB struct {
     url string
     secret string
