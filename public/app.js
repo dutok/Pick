@@ -100,7 +100,6 @@ function runExample() {
         var prefix = txt.substring(17, 18);
         var prefix2 = txt.substring(17, 25)
         var time = txt.substring(2, 9);
-        console.log(prefix2);
         if (prefix == "<") {
             var msg = txt.substring(16);
             var name = txt.substring(txt.lastIndexOf("<")+1,txt.lastIndexOf(">"));
@@ -174,18 +173,15 @@ function runExample() {
         var serverurl = "http://" + window.location.host + "/command";
         var url = serverurl + "/" + val + "/" + token;
         $.post(url);
-        console.log(url)
     }
     
     function sendChat(e) {
         e.preventDefault();
         var val = $chatinp.val();
-        console.log("val: " + val);
         $chatinp.val(null);
         var serverurl = "http://" + window.location.host + "/command";
         var url = serverurl + "/say " + val + "/" + token;
         $.post(url);
-        console.log(url)
     }
     
     function loadConfigs() {
@@ -214,7 +210,6 @@ function runExample() {
     
     function loadDashboard() {
         $.getJSON( "/server", function( data ) {
-          console.log(data);
           $('#playerbar').css("width", data.NumPlayers / data.MaxPlayers * 100 + "%");
           $('#players').text(data.NumPlayers + "/" + data.MaxPlayers + " players online");
           
@@ -249,12 +244,10 @@ function runExample() {
     }
     
     function updateFile() {
-        console.log("Updated!");
         var id = $('#fileid').val();
         var content = $('#filecontents').val();
         var newcontent = escape(content.replace(/\//g, "&#47;"));
         var url = "/update/" + id + "/" + newcontent + "/" + token;
-        console.log(url);
         $.post( url, function( data ) {
           toast(data, 4000)
         });
