@@ -23,7 +23,8 @@
             <span class="logo">Pick</span>
         </div></li>
         <a id="button-dashboard" href="#dashboard"><li><i class="tiny mdi-action-dashboard"></i> Dashboard</li></a>
-        <a id="button-console" href="#console"><li><i class="tiny mdi-action-question-answer"></i> Console</li></a>
+        <a id="button-console" href="#console"><li><i class="tiny mdi-image-crop-3-2"></i> Console</li></a>
+        <a id="button-chat" href="#chat"><li><i class="tiny mdi-action-question-answer"></i> Chat</li></a>
         <a id="button-editor" href="#editor"><li><i class="mdi-file-folder"></i> File Editor</li></a>
         <li class="hide-on-large-only"><a href="#logout">Logout</a></li>
       </ul>
@@ -33,15 +34,14 @@
     <div id="pages">
         <div id="page-console">
             <div class="container">
-            
                <h2>Console</h2>
-               <ul id="chatbox" class="collection with-header chatbox">
+               <ul id="console" class="collection with-header chatbox">
                </ul>
                 <div class="row">
-                  <form id="chatForm">
+                  <form id="consoleForm">
                       <div class="input-field">
                         <i class="mdi-action-input prefix"></i>
-                        <input name="data" id="icon_prefix" type="text" class="validate">
+                        <input name="consoledata" id="icon_prefix consolemessage" type="text" class="validate">
                         <label for="icon_prefix">Send command</label>
                       </div>
                   </form>
@@ -104,6 +104,22 @@
                   </div>
                </div>
              </div>
+            </div>
+        </div>
+        <div id="page-chat">
+            <div class="container">
+                <h2>Chat</h2>
+                <ul id="chat" class="collection with-header chatbox">
+               </ul>
+                <div class="row">
+                  <form id="chatForm">
+                      <div class="input-field">
+                        <i class="mdi-communication-message prefix"></i>
+                        <input name="chatdata" id="icon_prefix chatmessage" type="text" class="validate">
+                        <label for="icon_prefix">Send chat</label>
+                      </div>
+                  </form>
+                </div>
             </div>
         </div>
     </div>

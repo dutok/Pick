@@ -4,8 +4,8 @@ function runExample() {
     
     var uid = null, email = null, username = null, avatar = null, token = null, messages = null, sub = null, members = {}, userName;
     var ref = new Firebase("https://go-mine.firebaseio.com");
-    var $inp = $('input[name=data]');
-    var $join = $('#joinForm');
+    var $consoleinp = $('input[name=consoledata]');
+    var $chatinp = $('input[name=chatdata]');
     
     // handle input and form events
     var authData = ref.getAuth();
@@ -16,11 +16,13 @@ function runExample() {
         showLogin();
     }
           
-    $('#chatForm').submit(sendCommand);
+    $('#consoleForm').submit(sendCommand);
+    $('#chatForm').submit(sendChat);
     $('#login').click(authenticate);
     $('a[href="#logout"]').click(logout);
     $('#button-editor').click(pageEditor);
     $('#button-console').click(pageConsole);
+    $('#button-chat').click(pageChat);
     $('#button-dashboard').click(pageDashboard);
     $('#button-start').click(start);
     $('#button-stop').click(stop);
@@ -62,6 +64,8 @@ function runExample() {
            pageEditor();
         } else if(window.location.href.indexOf("console") > -1) {
            pageConsole();
+        } else if(window.location.href.indexOf("chat") > -1) {
+           pageChat();
         } else {
             pageDashboard();
         }
@@ -80,19 +84,33 @@ function runExample() {
     }
     
     function loadConsole() {
-        $('#chatbox').empty();
+        $('#console').empty();
         messages = ref.child('console/messages').limitToLast(30);
         messages.on('child_added', newMessage);
-        messages.on('child_removed', dropMessage);   
+        messages.on('child_removed', dropMessage);
     }
     
     // create a new message in the DOM after it comes
     // in from the server (via child_added)
     function newMessage(snap) {
-        var $chat = $('#chatbox');
+        var $console = $('#console');
+        var $chat = $('#chat');
         var dat = snap.val();
         var txt = dat.Body;
-        $('<li class="collection-item flow-text" /> ').attr('data-id', snap.key()).text(txt).appendTo($chat);
+        var prefix = txt.substring(17, 18);
+        var prefix2 = txt.substring(17, 25)
+        var time = txt.substring(2, 9);
+        console.log(prefix2);
+        if (prefix == "<") {
+            var msg = txt.substring(16);
+            var name = txt.substring(txt.lastIndexOf("<")+1,txt.lastIndexOf(">"));
+            $('<li class="collection-item flow-text" /> ').attr('data-id', snap.key()).html("<span class='badge'>[" + time + "]</span>" + " <strong>" + name + "</strong>: " + msg).appendTo($chat);
+        } else if (prefix2 == "[Server]") {
+            msg = txt.substring(26);
+            $('<li class="collection-item flow-text" /> ').attr('data-id', snap.key()).html("<span class='badge'>[" + time + "]</span>" + " <strong>Server</strong>: " + msg).appendTo($chat);
+        } else {
+            $('<li class="collection-item flow-text" /> ').attr('data-id', snap.key()).text(txt).appendTo($console);
+        }
         $chat.scrollTop($chat.height());
     }
     
@@ -116,6 +134,14 @@ function runExample() {
         
         $('#button-editor').addClass("active");
         $('#button-editor').siblings().removeClass("active");
+    }
+    
+    function pageChat() {
+        $('#page-chat').show();
+        $('#page-chat').siblings().hide();
+        
+        $('#button-chat').addClass("active");
+        $('#button-chat').siblings().removeClass("active");
     }
     
     function pageConsole() {
@@ -143,10 +169,21 @@ function runExample() {
      // post the forms contents and attempt to write a message
     function sendCommand(e) {
         e.preventDefault();
-        var val = $inp.val();
-        $inp.val(null);
+        var val = $consoleinp.val();
+        $consoleinp.val(null);
         var serverurl = "http://" + window.location.host + "/command";
         var url = serverurl + "/" + val + "/" + token;
+        $.post(url);
+        console.log(url)
+    }
+    
+    function sendChat(e) {
+        e.preventDefault();
+        var val = $chatinp.val();
+        console.log("val: " + val);
+        $chatinp.val(null);
+        var serverurl = "http://" + window.location.host + "/command";
+        var url = serverurl + "/say " + val + "/" + token;
         $.post(url);
         console.log(url)
     }
