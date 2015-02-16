@@ -32,7 +32,7 @@ func httpServer(db DB, server Server) {
 		command := mux.Vars(r)["command"]
 		auth := db.check(token)
 		if auth == 0 {
-			log.Println("sendCommand: Invalid token.")
+			log.Println("Auth: sendCommand - Invalid token.")
 		} else {
 			server.sendCommand(command)
 		}
@@ -50,7 +50,7 @@ func httpServer(db DB, server Server) {
 		token := mux.Vars(r)["token"]
 		auth := db.check(token)
 		if auth == 0 {
-			log.Println("stop: Invalid token.")
+			log.Println("Auth: stop - Invalid token.")
 		} else {
 			server.stop()
 		}
@@ -59,7 +59,7 @@ func httpServer(db DB, server Server) {
 		token := mux.Vars(r)["token"]
 		auth := db.check(token)
 		if auth == 0 {
-			log.Println("start: Invalid token.")
+			log.Println("Auth: start - Invalid token.")
 		} else {
 			server = newServer(db)
 			startServer(&server)
@@ -70,7 +70,7 @@ func httpServer(db DB, server Server) {
 	})
 	r.PathPrefix("/").Handler(http.FileServer(http.Dir("public")))
 	http.Handle("/", r)
-	log.Println("HTTP server started on :9000")
+	log.Println("HTTP server: STARTED on :9000")
 	http.ListenAndServe(":9000", nil)
 }
 
@@ -86,7 +86,7 @@ func getConfigs(w http.ResponseWriter, r *http.Request, db DB) {
 	token := mux.Vars(r)["token"]
 	auth := db.check(token)
 	if auth == 0 {
-		log.Println("getConfigs: Invalid token.")
+		log.Println("Auth: getConfigs - Invalid token.")
 	} else {
 		configjson, err := json.Marshal(files)
 		if err != nil {
@@ -104,7 +104,7 @@ func getConfig(w http.ResponseWriter, r *http.Request, db DB) {
 	id := mux.Vars(r)["id"]
 	auth := db.check(token)
 	if auth == 0 {
-		log.Println("getConfig: Invalid token.")
+		log.Println("Auth: getConfig - Invalid token.")
 	} else {
 		i, err = strconv.Atoi(id)
 		check(err, "HTTP server")
@@ -128,7 +128,7 @@ func setConfig(w http.ResponseWriter, r *http.Request, db DB) {
 	content := mux.Vars(r)["content"]
 	auth := db.check(token)
 	if auth == 0 {
-		log.Println("setConfig: Invalid token.")
+		log.Println("Auth: setConfig - Invalid token.")
 	} else {
 		i, _ = strconv.Atoi(id)
 		file := files[i]
@@ -136,17 +136,5 @@ func setConfig(w http.ResponseWriter, r *http.Request, db DB) {
 		err := ioutil.WriteFile(file, []byte(newcontent), 0644)
 		check(err, "HTTP server")
 		w.Write([]byte("The file was updated successfully."))
-	}
-}
-
-func check(err error, source string) {
-	if err != nil {
-		log.Println("[" + source + "] " + err.Error())
-	}
-}
-
-func fatalcheck(err error) {
-	if err != nil {
-		log.Fatal(err)
 	}
 }
