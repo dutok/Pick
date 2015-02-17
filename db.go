@@ -6,7 +6,6 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"time"
 )
 
 var lastMessage string
@@ -32,12 +31,9 @@ func (db *DB) message(msg string) {
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
-	if err != nil {
-		time.Sleep(time.Second)
-		resp, err = client.Do(req)
-		if err != nil {
-			log.Println(err)
-		}
+	
+	for err !=nil {
+	    resp, err = client.Do(req)
 	}
 
 	defer resp.Body.Close()

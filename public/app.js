@@ -2,7 +2,7 @@ $(window).load(function(){
 function runExample() {
     "use strict";
     
-    var uid = null, email = null, username = null, avatar = null, token = null, messages = null, sub = null, members = {}, userName;
+    var timer = 0, uid = null, email = null, username = null, avatar = null, token = null, messages = null, sub = null, members = {}, userName;
     var ref = new Firebase("https://go-mine.firebaseio.com");
     var $consoleinp = $('input[name=consoledata]');
     var $chatinp = $('input[name=chatdata]');
@@ -26,6 +26,7 @@ function runExample() {
     $('#button-dashboard').click(pageDashboard);
     $('#button-start').click(start);
     $('#button-stop').click(stop);
+    $('#button-refresh').click(refresh);
     $('#editsubmit').click(updateFile);
     
     function authenticate(e) {
@@ -58,6 +59,7 @@ function runExample() {
         loadConsole();
         loadConfigs();
         loadDashboard();
+        startTimer();
         $('#login-layer').hide();
         $('#main-layer').show();
         if(window.location.href.indexOf("editor") > -1) {
@@ -88,6 +90,8 @@ function runExample() {
         messages = ref.child('console/messages').limitToLast(30);
         messages.on('child_added', newMessage);
         messages.on('child_removed', dropMessage);
+        $('#console').scrollTop($('#console').height());
+        $('#chat').scrollTop($('#chat').height());
     }
     
     // create a new message in the DOM after it comes
@@ -110,6 +114,7 @@ function runExample() {
         } else {
             $('<li class="collection-item flow-text" /> ').attr('data-id', snap.key()).text(txt).appendTo($console);
         }
+        $console.scrollTop($console.height());
         $chat.scrollTop($chat.height());
     }
     
@@ -198,6 +203,25 @@ function runExample() {
         });
     }
     
+    function startTimer()
+    {
+        setInterval(function(){ timerUp(); }, 1000);
+    }
+    
+    function timerUp()
+    {
+        timer++;
+        var resetat=30;
+        if(timer == resetat){
+            refresh();
+        }
+        var tleft=resetat-timer;
+        if (tleft === 0){
+            timer = 0;
+        }
+        document.getElementById('refreshtimer').innerHTML=tleft;
+    }
+    
     function start() {
         $.get( "/server/start/" + token, function( data ) {});
         toast("Server started!", 4000);
@@ -206,6 +230,13 @@ function runExample() {
     function stop() {
         $.get( "/server/stop/" + token, function( data ) {});
         toast("Server stopped!", 4000);
+    }
+    
+    function refresh() {
+        loadDashboard();
+        if(window.location.href.indexOf("dashboard") > -1) {
+            toast("Dashboard refreshed!", 1000);
+        }
     }
     
     function loadDashboard() {

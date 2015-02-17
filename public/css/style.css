@@ -76,3 +76,13 @@ ul.side-nav.fixed i {
     text-align: center;
     margin-right: 1rem;
 }
+
+.page-header .group {
+    display: block;
+    float: left;
+    padding-right: 6px;
+}
+
+.page-header .page-button {
+    display:block;
+}
