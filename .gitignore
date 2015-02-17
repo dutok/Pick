@@ -24,6 +24,3 @@ _testmain.go
 *.prof
 
 server
-public/js
-public/css
-public/font
