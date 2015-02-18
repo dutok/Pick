@@ -86,3 +86,7 @@ ul.side-nav.fixed i {
 .page-header .page-button {
     display:block;
 }
+
+.server-chat {
+    color: #9e9e9e;
+}

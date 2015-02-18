@@ -37,7 +37,9 @@ function runExample() {
     }
     
     function loadConsole() {
-        $('#console').empty();
+        var $console = $('#console');
+        var $chat = $('#chat');
+        $console.empty();
         consoleSocket = new WebSocket("ws://"+ domain +"/sock");
         consoleSocket.onmessage = function (event) {
           newMessage(event.data);
@@ -61,7 +63,7 @@ function runExample() {
             $('<li class="collection-item flow-text" /> ').html("<span class='badge'>[" + time + "]</span>" + " <strong>" + name + "</strong>: " + msg).appendTo($chat);
         } else if (prefix2 == "[Server]") {
             msg = txt.substring(26);
-            $('<li class="collection-item flow-text" /> ').html("<span class='badge'>[" + time + "]</span>" + " <strong>Server</strong>: " + msg).appendTo($chat);
+            $('<li class="collection-item flow-text" /> ').html("<span class='badge'>[" + time + "]</span>" + " <strong class='server-chat'>Server</strong>: " + msg).appendTo($chat);
         } else {
             $('<li class="collection-item flow-text" /> ').text(txt).appendTo($console);
         }
