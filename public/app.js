@@ -95,6 +95,8 @@ function runExample() {
         
         $('#button-console').addClass("active");
         $('#button-console').siblings().removeClass("active");
+        
+        $('#console').scrollTop($('#console')[0].scrollHeight);
     }
     
     function pageDashboard() {
