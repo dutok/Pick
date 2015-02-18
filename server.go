@@ -19,6 +19,7 @@ type Server struct {
 	Stdinpipe  *io.WriteCloser
 	Status     *int
 	Cmdchan    chan string
+	Messages   *[]string
 	Query      *mcgoquery.Client
 	Stats      *Stats
 }
@@ -56,7 +57,8 @@ func newServer() Server {
 	var c mcgoquery.Client
 	var stats Stats
 	status := 0
-	server := Server{&host, &queryport, command, &stdoutPipe, &stdinPipe, &status, cmdchan, &c, &stats}
+	var messages []string
+	server := Server{&host, &queryport, command, &stdoutPipe, &stdinPipe, &status, cmdchan, &messages, &c, &stats}
 	return server
 }
 
@@ -85,11 +87,11 @@ func startServer(server *Server) {
 			str, _ := rd.ReadString('\n')
 			if str != "" {
 				if strings.Contains(str, "Saving chunks for level") {
-					broadcastMessage([]byte(str))
+					broadcastMessage([]byte(str), server.Messages)
 					server.Command.Process.Kill()
 					break
 				} else if strings.Contains(str, "Query running") {
-					broadcastMessage([]byte(str))
+					broadcastMessage([]byte(str), server.Messages)
 					server.Query, err = mcgoquery.Create(*server.Host, *server.QueryPort)
 					if err == nil {
 						go queryTimer(*server)
@@ -97,7 +99,7 @@ func startServer(server *Server) {
 						log.Println(err)
 					}
 				} else {
-					broadcastMessage([]byte(str))
+					broadcastMessage([]byte(str), server.Messages)
 				}
 			}
 		}

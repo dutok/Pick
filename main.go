@@ -6,7 +6,6 @@ import (
     oauth2 "github.com/goincremental/negroni-oauth2"
     sessions "github.com/goincremental/negroni-sessions"
     "github.com/goincremental/negroni-sessions/cookiestore"
-	"fmt"
 	"net/http"
 	/*"io/ioutil"
 	"net/http"
@@ -25,14 +24,9 @@ func main() {
 
 func httpServer(server *Server) {
 	secureMux := http.NewServeMux()
-
-    secureMux.HandleFunc("/restrict", func(w http.ResponseWriter, req *http.Request) {
-        token := oauth2.GetToken(req)
-        fmt.Fprintf(w, "OK: %s", token.Access())
-    })
     
     secureMux.HandleFunc("/sock", func(w http.ResponseWriter, r *http.Request) {
-        sockServer(server, w, r)
+        sockServer(server, server.Messages, w, r)
     })
     
     secureMux.Handle("/", http.FileServer(http.Dir("public")))
@@ -54,7 +48,6 @@ func httpServer(server *Server) {
 
     //There is probably a nicer way to handle this than repeat the restricted routes again
     //of course, you could use something like gorilla/mux and define prefix / regex etc.
-    router.Handle("/restrict", secure)
     router.Handle("/", secure)
     router.Handle("/sock", secure)
 

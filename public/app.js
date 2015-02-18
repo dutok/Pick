@@ -2,7 +2,7 @@ $(window).load(function(){
 function runExample() {
     "use strict";
     
-    var authData = null, timer = 0, uid = null, email = null, username = null, avatar = null, token = null, messages = null, sub = null, members = {}, userName;
+    var consoleSocket = null;
     var $consoleinp = $('input[name=consoledata]');
     var $chatinp = $('input[name=chatdata]');
     var domain = window.location.hostname;
@@ -22,9 +22,9 @@ function runExample() {
     
     function showMain(){
         loadConsole();
-        loadConfigs();
-        loadDashboard();
-        startTimer();
+        //loadConfigs();
+        //loadDashboard();
+        //startTimer();
         if(window.location.href.indexOf("editor") > -1) {
            pageEditor();
         } else if(window.location.href.indexOf("console") > -1) {
@@ -45,8 +45,8 @@ function runExample() {
     
     function loadConsole() {
         $('#console').empty();
-        var exampleSocket = new WebSocket("ws://"+ domain +"/sock");
-        exampleSocket.onmessage = function (event) {
+        consoleSocket = new WebSocket("ws://"+ domain +"/sock");
+        consoleSocket.onmessage = function (event) {
           newMessage(event.data);
         }
         $('#console').scrollTop($('#console').height());
@@ -121,18 +121,14 @@ function runExample() {
         e.preventDefault();
         var val = $consoleinp.val();
         $consoleinp.val(null);
-        var serverurl = "http://" + window.location.host + "/command";
-        var url = serverurl + "/" + val + "/" + token;
-        $.post(url);
+        consoleSocket.send(val);
     }
     
     function sendChat(e) {
         e.preventDefault();
         var val = $chatinp.val();
         $chatinp.val(null);
-        var serverurl = "http://" + window.location.host + "/command";
-        var url = serverurl + "/say " + val + "/" + token;
-        $.post(url);
+        consoleSocket.send("say " + val);
     }
     
     function loadConfigs() {
