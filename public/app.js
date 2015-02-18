@@ -2,7 +2,7 @@ $(window).load(function(){
 function runExample() {
     "use strict";
     
-    var consoleSocket = null;
+    var consoleSocket = null, timer = null;
     var $consoleinp = $('input[name=consoledata]');
     var $chatinp = $('input[name=chatdata]');
     var domain = window.location.hostname;
@@ -22,9 +22,9 @@ function runExample() {
     
     function showMain(){
         loadConsole();
-        //loadConfigs();
-        //loadDashboard();
-        //startTimer();
+        loadConfigs();
+        loadDashboard();
+        startTimer();
         if(window.location.href.indexOf("editor") > -1) {
            pageEditor();
         } else if(window.location.href.indexOf("console") > -1) {
@@ -34,13 +34,6 @@ function runExample() {
         } else {
             pageDashboard();
         }
-    }
-    
-    function allowSending(user) {
-        var allowed = ref.child("allowed");
-        allowed.child(user.github.accessToken).set({
-          name: user.github.username,
-        });
     }
     
     function loadConsole() {
@@ -134,7 +127,7 @@ function runExample() {
     function loadConfigs() {
         var $files = $('#files');
         $files.empty();
-        $.getJSON( "/configs/" + token, function( data ) {
+        $.getJSON( "/configs", function( data ) {
           var items = [];
           $.each( data, function( key, val ) {
             $files.append("<li><div class='file-name collapsible-header flow-text truncate'><a class='file' id='file"+ key +"' href='#editor'><i class='mdi-editor-insert-drive-file'></i>"+ val +"</a></div></li>");
@@ -165,12 +158,12 @@ function runExample() {
     }
     
     function start() {
-        $.get( "/server/start/" + token, function( data ) {});
+        $.get( "/server/start", function( data ) {});
         toast("Server started!", 4000);
     }
     
     function stop() {
-        $.get( "/server/stop/" + token, function( data ) {});
+        consoleSocket.send("stop");
         toast("Server stopped!", 4000);
     }
     
@@ -213,14 +206,14 @@ function runExample() {
         $modal.openModal();
         $('#filetitle').text(name);
         $('#fileid').val(id);
-        $('#filecontents').load("/config/" + id + "/" + token);
+        $('#filecontents').load("/config/" + id);
     }
     
     function updateFile() {
         var id = $('#fileid').val();
         var content = $('#filecontents').val();
         var newcontent = escape(content.replace(/\//g, "&#47;"));
-        var url = "/update/" + id + "/" + newcontent + "/" + token;
+        var url = "/update/" + id + "/" + newcontent;
         $.post( url, function( data ) {
           toast(data, 4000)
         });

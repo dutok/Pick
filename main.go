@@ -1,16 +1,11 @@
 package main
 
 import (
-	//*"encoding/json"
 	"github.com/codegangsta/negroni"
     oauth2 "github.com/goincremental/negroni-oauth2"
     sessions "github.com/goincremental/negroni-sessions"
     "github.com/goincremental/negroni-sessions/cookiestore"
-	"net/http"
-	/*"io/ioutil"
-	"net/http"
-	"strconv"
-	"strings"*/
+    "github.com/gorilla/mux"
 )
 
 var err error
@@ -23,13 +18,9 @@ func main() {
 }
 
 func httpServer(server *Server) {
-	secureMux := http.NewServeMux()
-    
-    secureMux.HandleFunc("/sock", func(w http.ResponseWriter, r *http.Request) {
-        sockServer(server, server.Messages, w, r)
-    })
-    
-    secureMux.Handle("/", http.FileServer(http.Dir("public")))
+	secureMux := mux.NewRouter()
+	
+	loadRoutes(secureMux, server)
 
     secure := negroni.New()
     secure.Use(oauth2.LoginRequired())
@@ -44,116 +35,13 @@ func httpServer(server *Server) {
         Scopes:       []string{"https://www.googleapis.com/auth/userinfo.email"},
     }))
 
-    router := http.NewServeMux()
+    router := mux.NewRouter()
 
     //There is probably a nicer way to handle this than repeat the restricted routes again
     //of course, you could use something like gorilla/mux and define prefix / regex etc.
-    router.Handle("/", secure)
-    router.Handle("/sock", secure)
+    router.PathPrefix("/").Handler(secure)
 
     n.UseHandler(router)
 
     n.Run(":80")
-	
-    /*
-	r.HandleFunc("/configs/{token}", func(w http.ResponseWriter, r *http.Request) {
-		getConfigs(w, r, db)
-	})
-	r.HandleFunc("/config/{id}/{token}", func(w http.ResponseWriter, r *http.Request) {
-		getConfig(w, r, db)
-	})
-	r.HandleFunc("/update/{id}/{content}/{token}", func(w http.ResponseWriter, r *http.Request) {
-		setConfig(w, r, db)
-	})
-	r.HandleFunc("/server/stop/{token}", func(w http.ResponseWriter, r *http.Request) {
-		token := mux.Vars(r)["token"]
-		auth := db.check(token)
-		if auth == 0 {
-			log.Println("Auth: stop - Invalid token.")
-		} else {
-			server.stop()
-		}
-	})
-	r.HandleFunc("/server/start/{token}", func(w http.ResponseWriter, r *http.Request) {
-		token := mux.Vars(r)["token"]
-		auth := db.check(token)
-		if auth == 0 {
-			log.Println("Auth: start - Invalid token.")
-		} else {
-			server = newServer(db)
-			startServer(&server)
-		}
-	})
-	r.HandleFunc("/server", func(w http.ResponseWriter, r *http.Request) {
-		getStats(w, r, &server)
-	})
-	
-	http.Handle("/", r)
-	log.Println("HTTP server: STARTED on :9000")
-	http.ListenAndServe(":9000", nil)*/
 }
-
-/*func getStats(w http.ResponseWriter, r *http.Request, server *Server) {
-	statsjson, err := json.Marshal(&server.Stats)
-	check(err, "Minecraft stats")
-
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(statsjson)
-}
-
-func getConfigs(w http.ResponseWriter, r *http.Request, db DB) {
-	token := mux.Vars(r)["token"]
-	auth := db.check(token)
-	if auth == 0 {
-		log.Println("Auth: getConfigs - Invalid token.")
-	} else {
-		configjson, err := json.Marshal(files)
-		if err != nil {
-			log.Println(err)
-		}
-
-		w.Header().Set("Content-Type", "application/json")
-		w.Write(configjson)
-	}
-}
-
-func getConfig(w http.ResponseWriter, r *http.Request, db DB) {
-	var i int
-	token := mux.Vars(r)["token"]
-	id := mux.Vars(r)["id"]
-	auth := db.check(token)
-	if auth == 0 {
-		log.Println("Auth: getConfig - Invalid token.")
-	} else {
-		i, err = strconv.Atoi(id)
-		check(err, "HTTP server")
-		file := files[i]
-		var buf, err = ioutil.ReadFile(file)
-		check(err, "HTTP server")
-
-		splitstring := strings.SplitAfter(file, "/")
-		filename := splitstring[len(splitstring)-1]
-
-		w.Header().Set("Content-Disposition", "attachment; filename="+filename)
-		w.Header().Set("Content-Type", "text/plain")
-		w.Write(buf)
-	}
-}
-
-func setConfig(w http.ResponseWriter, r *http.Request, db DB) {
-	var i int
-	token := mux.Vars(r)["token"]
-	id := mux.Vars(r)["id"]
-	content := mux.Vars(r)["content"]
-	auth := db.check(token)
-	if auth == 0 {
-		log.Println("Auth: setConfig - Invalid token.")
-	} else {
-		i, _ = strconv.Atoi(id)
-		file := files[i]
-		newcontent := strings.Replace(content, "&#47;", "/", -1)
-		err := ioutil.WriteFile(file, []byte(newcontent), 0644)
-		check(err, "HTTP server")
-		w.Write([]byte("The file was updated successfully."))
-	}
-} */
