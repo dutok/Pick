@@ -2,11 +2,10 @@ package main
 
 import (
 	"github.com/gorilla/websocket"
-	"net"
 	"log"
-	"sync"
+	"net"
 	"net/http"
-	
+	"sync"
 )
 
 var ActiveClients = make(map[ClientConn]int)
@@ -22,10 +21,10 @@ func addClient(cc ClientConn, messages *[]string) {
 	ActiveClients[cc] = 0
 	ActiveClientsRWMutex.Unlock()
 	for _, message := range *messages {
-        if err := cc.websocket.WriteMessage(websocket.TextMessage, []byte(message)); err != nil {
+		if err := cc.websocket.WriteMessage(websocket.TextMessage, []byte(message)); err != nil {
 			return
 		}
-    }
+	}
 }
 
 func deleteClient(cc ClientConn) {
@@ -38,7 +37,7 @@ func broadcastMessage(message []byte, messages *[]string) {
 	ActiveClientsRWMutex.RLock()
 	defer ActiveClientsRWMutex.RUnlock()
 
-    *messages = append(*messages, string(message))
+	*messages = append(*messages, string(message))
 
 	for client, _ := range ActiveClients {
 		if err := client.websocket.WriteMessage(websocket.TextMessage, message); err != nil {
