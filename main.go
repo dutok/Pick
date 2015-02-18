@@ -1,42 +1,68 @@
 package main
 
 import (
-	"encoding/json"
-	"github.com/gorilla/mux"
-	"io/ioutil"
-	"log"
+	//*"encoding/json"
+	"github.com/codegangsta/negroni"
+    oauth2 "github.com/goincremental/negroni-oauth2"
+    sessions "github.com/goincremental/negroni-sessions"
+    "github.com/goincremental/negroni-sessions/cookiestore"
+	"fmt"
 	"net/http"
-	"runtime"
+	/*"io/ioutil"
+	"net/http"
 	"strconv"
-	"strings"
+	"strings"*/
 )
-
-var firebaseurl string = "https://go-mine.firebaseio.com/"
-var secret string = "IcVM9hRKCqz4GTkUpiHphbNBHg7y4hW62FJTM5bz"
 
 var err error
 
 func main() {
-	runtime.GOMAXPROCS(2)
-	db := DB{firebaseurl, secret}
 	loadConfig()
-	server := newServer(db)
+	server := newServer()
 	startServer(&server)
-	httpServer(db, server)
+	httpServer(&server)
 }
 
-func httpServer(db DB, server Server) {
-	r := mux.NewRouter()
-	r.HandleFunc("/command/{command}/{token}", func(w http.ResponseWriter, r *http.Request) {
-		token := mux.Vars(r)["token"]
-		command := mux.Vars(r)["command"]
-		auth := db.check(token)
-		if auth == 0 {
-			log.Println("Auth: sendCommand - Invalid token.")
-		} else {
-			server.sendCommand(command)
-		}
-	})
+func httpServer(server *Server) {
+	secureMux := http.NewServeMux()
+
+    secureMux.HandleFunc("/restrict", func(w http.ResponseWriter, req *http.Request) {
+        token := oauth2.GetToken(req)
+        fmt.Fprintf(w, "OK: %s", token.Access())
+    })
+    
+    secureMux.HandleFunc("/sock", func(w http.ResponseWriter, r *http.Request) {
+        sockServer(server, w, r)
+    })
+    
+    secureMux.Handle("/", http.FileServer(http.Dir("public")))
+
+    secure := negroni.New()
+    secure.Use(oauth2.LoginRequired())
+    secure.UseHandler(secureMux)
+
+    n := negroni.New()
+    n.Use(sessions.Sessions("my_session", cookiestore.New([]byte("secret123"))))
+    n.Use(oauth2.Google(&oauth2.Config{
+        ClientID:     "824000373870-148afj3scuj2fururtrn2ffn9vu48rfs.apps.googleusercontent.com",
+        ClientSecret: "tB9cqq53V1H0yXjsp1SGKcDv",
+        RedirectURL:  "http://dutok.koding.io/oauth2callback",
+        Scopes:       []string{"https://www.googleapis.com/auth/userinfo.email"},
+    }))
+
+    router := http.NewServeMux()
+
+    //There is probably a nicer way to handle this than repeat the restricted routes again
+    //of course, you could use something like gorilla/mux and define prefix / regex etc.
+    router.Handle("/restrict", secure)
+    router.Handle("/", secure)
+    router.Handle("/sock", secure)
+
+    n.UseHandler(router)
+
+    n.Run(":80")
+	
+    /*
 	r.HandleFunc("/configs/{token}", func(w http.ResponseWriter, r *http.Request) {
 		getConfigs(w, r, db)
 	})
@@ -68,13 +94,13 @@ func httpServer(db DB, server Server) {
 	r.HandleFunc("/server", func(w http.ResponseWriter, r *http.Request) {
 		getStats(w, r, &server)
 	})
-	r.PathPrefix("/").Handler(http.FileServer(http.Dir("public")))
+	
 	http.Handle("/", r)
 	log.Println("HTTP server: STARTED on :9000")
-	http.ListenAndServe(":9000", nil)
+	http.ListenAndServe(":9000", nil)*/
 }
 
-func getStats(w http.ResponseWriter, r *http.Request, server *Server) {
+/*func getStats(w http.ResponseWriter, r *http.Request, server *Server) {
 	statsjson, err := json.Marshal(&server.Stats)
 	check(err, "Minecraft stats")
 
@@ -137,4 +163,4 @@ func setConfig(w http.ResponseWriter, r *http.Request, db DB) {
 		check(err, "HTTP server")
 		w.Write([]byte("The file was updated successfully."))
 	}
-}
+} */

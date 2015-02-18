@@ -15,7 +15,6 @@ type Server struct {
 	Host       *string
 	QueryPort  *int
 	Command    *exec.Cmd
-	Db         DB
 	Stdoutpipe *io.ReadCloser
 	Stdinpipe  *io.WriteCloser
 	Status     *int
@@ -44,7 +43,7 @@ type ServerStats struct {
 	Memory sigar.Mem
 }
 
-func newServer(db DB) Server {
+func newServer() Server {
 	command := exec.Command("java", "-Xmx512M", "-Xms512M", "-jar", "minecraft_server.jar", "nogui")
 	command.Dir = "server"
 	stdoutPipe, err := command.StdoutPipe()
@@ -57,7 +56,7 @@ func newServer(db DB) Server {
 	var c mcgoquery.Client
 	var stats Stats
 	status := 0
-	server := Server{&host, &queryport, command, db, &stdoutPipe, &stdinPipe, &status, cmdchan, &c, &stats}
+	server := Server{&host, &queryport, command, &stdoutPipe, &stdinPipe, &status, cmdchan, &c, &stats}
 	return server
 }
 
@@ -86,11 +85,11 @@ func startServer(server *Server) {
 			str, _ := rd.ReadString('\n')
 			if str != "" {
 				if strings.Contains(str, "Saving chunks for level") {
-					server.Db.message(str)
+					broadcastMessage([]byte(str))
 					server.Command.Process.Kill()
 					break
 				} else if strings.Contains(str, "Query running") {
-					server.Db.message(str)
+					broadcastMessage([]byte(str))
 					server.Query, err = mcgoquery.Create(*server.Host, *server.QueryPort)
 					if err == nil {
 						go queryTimer(*server)
@@ -98,7 +97,7 @@ func startServer(server *Server) {
 						log.Println(err)
 					}
 				} else {
-					server.Db.message(str)
+					broadcastMessage([]byte(str))
 				}
 			}
 		}

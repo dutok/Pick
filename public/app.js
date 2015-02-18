@@ -2,24 +2,15 @@ $(window).load(function(){
 function runExample() {
     "use strict";
     
-    var timer = 0, uid = null, email = null, username = null, avatar = null, token = null, messages = null, sub = null, members = {}, userName;
-    var ref = new Firebase("https://go-mine.firebaseio.com");
+    var authData = null, timer = 0, uid = null, email = null, username = null, avatar = null, token = null, messages = null, sub = null, members = {}, userName;
     var $consoleinp = $('input[name=consoledata]');
     var $chatinp = $('input[name=chatdata]');
+    var domain = window.location.hostname;
     
-    // handle input and form events
-    var authData = ref.getAuth();
-    if (authData) {
-        setUser(authData);
-        showMain();
-    } else {
-        showLogin();
-    }
+    showMain();
           
     $('#consoleForm').submit(sendCommand);
     $('#chatForm').submit(sendChat);
-    $('#login').click(authenticate);
-    $('a[href="#logout"]').click(logout);
     $('#button-editor').click(pageEditor);
     $('#button-console').click(pageConsole);
     $('#button-chat').click(pageChat);
@@ -29,39 +20,11 @@ function runExample() {
     $('#button-refresh').click(refresh);
     $('#editsubmit').click(updateFile);
     
-    function authenticate(e) {
-        e.preventDefault();
-        ref.authWithOAuthPopup('github', function(err, user) {
-            if (err) {
-                console.log(err, 'error');
-            } else if (user) {
-                // logged in!
-                setUser(user);
-                showMain();
-            } else {
-                // logged out
-                showLogin();
-            }
-        },
-        {remember: "default",});
-    }
-    
-    function setUser(user){
-        allowSending(user);
-        uid = user.uid;
-        token = user.github.accessToken;
-        avatar = user.github.cachedUserProfile.avatar_url;
-        username = user.github.username;
-        email = user.github.email;
-    }
-    
     function showMain(){
         loadConsole();
         loadConfigs();
         loadDashboard();
         startTimer();
-        $('#login-layer').hide();
-        $('#main-layer').show();
         if(window.location.href.indexOf("editor") > -1) {
            pageEditor();
         } else if(window.location.href.indexOf("console") > -1) {
@@ -73,11 +36,6 @@ function runExample() {
         }
     }
     
-    function showLogin() {
-        $('#login-layer').show();
-        $('#main-layer').hide();
-    }
-    
     function allowSending(user) {
         var allowed = ref.child("allowed");
         allowed.child(user.github.accessToken).set({
@@ -87,9 +45,10 @@ function runExample() {
     
     function loadConsole() {
         $('#console').empty();
-        messages = ref.child('console/messages').limitToLast(30);
-        messages.on('child_added', newMessage);
-        messages.on('child_removed', dropMessage);
+        var exampleSocket = new WebSocket("ws://"+ domain +"/sock");
+        exampleSocket.onmessage = function (event) {
+          newMessage(event.data);
+        }
         $('#console').scrollTop($('#console').height());
         $('#chat').scrollTop($('#chat').height());
     }
@@ -99,35 +58,22 @@ function runExample() {
     function newMessage(snap) {
         var $console = $('#console');
         var $chat = $('#chat');
-        var dat = snap.val();
-        var txt = dat.Body;
+        var txt = snap;
         var prefix = txt.substring(17, 18);
         var prefix2 = txt.substring(17, 25)
         var time = txt.substring(2, 9);
         if (prefix == "<") {
             var msg = txt.substring(16);
             var name = txt.substring(txt.lastIndexOf("<")+1,txt.lastIndexOf(">"));
-            $('<li class="collection-item flow-text" /> ').attr('data-id', snap.key()).html("<span class='badge'>[" + time + "]</span>" + " <strong>" + name + "</strong>: " + msg).appendTo($chat);
+            $('<li class="collection-item flow-text" /> ').html("<span class='badge'>[" + time + "]</span>" + " <strong>" + name + "</strong>: " + msg).appendTo($chat);
         } else if (prefix2 == "[Server]") {
             msg = txt.substring(26);
-            $('<li class="collection-item flow-text" /> ').attr('data-id', snap.key()).html("<span class='badge'>[" + time + "]</span>" + " <strong>Server</strong>: " + msg).appendTo($chat);
+            $('<li class="collection-item flow-text" /> ').html("<span class='badge'>[" + time + "]</span>" + " <strong>Server</strong>: " + msg).appendTo($chat);
         } else {
-            $('<li class="collection-item flow-text" /> ').attr('data-id', snap.key()).text(txt).appendTo($console);
+            $('<li class="collection-item flow-text" /> ').text(txt).appendTo($console);
         }
         $console.scrollTop($console.height());
         $chat.scrollTop($chat.height());
-    }
-    
-    // remove message locally after child_removed
-    function dropMessage(snap) {
-        $('li[data-id="'+snap.key()+'"]').remove();
-    }
-    
-    function logout(e) {
-       e.preventDefault();
-       ref.unauth();
-       $('#login-layer').show();
-       $('#main-layer').hide();
     }
     
     // page functions
