@@ -42,8 +42,8 @@ function runExample() {
         consoleSocket.onmessage = function (event) {
           newMessage(event.data);
         }
-        $('#console').scrollTop($('#console').height());
-        $('#chat').scrollTop($('#chat').height());
+        $console.scrollTop($console[0].scrollHeight);
+        $chat.scrollTop($chat[0].scrollHeight);
     }
     
     // create a new message in the DOM after it comes
@@ -65,8 +65,8 @@ function runExample() {
         } else {
             $('<li class="collection-item flow-text" /> ').text(txt).appendTo($console);
         }
-        $console.scrollTop($console.height());
-        $chat.scrollTop($chat.height());
+        $console.scrollTop($console[0].scrollHeight);
+        $chat.scrollTop($chat[0].scrollHeight);
     }
     
     // page functions
