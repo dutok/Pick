@@ -22,6 +22,9 @@
         <a id="button-console" href="#console"><li><i class="tiny mdi-image-crop-3-2"></i> Console</li></a>
         <a id="button-chat" href="#chat"><li><i class="tiny mdi-action-question-answer"></i> Chat</li></a>
         <a id="button-editor" href="#editor"><li><i class="mdi-file-folder"></i> File Editor</li></a>
+        <a id="button-support" href="#support"><li><i class="mdi-action-help"></i> Support</li></a>
+        <li class="divider"></li>
+        <a id="button-account" href="#"><li id="accountName"><i class="mdi-social-person"></i></li></a>
         <li class="hide-on-large-only"><a href="/logout">Logout</a></li>
       </ul>
       <a href="#" data-activates="slide-out" class="button-collapse">&nbsp; <i class="mdi-navigation-menu"></i></a>
@@ -119,8 +122,37 @@
                 </div>
             </div>
         </div>
+        <div id="page-support">
+            <div class="container">
+                <h2>Support</h2>
+                <div class="row">
+                  <div class="col s12 m6">
+                    <ul class="collapsible" data-collapsible="accordion">
+                        <li>
+                          <div class="collapsible-header truncate">1. How do I update config files?</div>
+                          <div class="collapsible-body"><p>You can visit the File Editor and find the file you wish to edit. Click the file and a dialog should pop-up with the contents of the file. Edit the textbox and then click "Update" when you're ready to re-upload it to the server.</p></div>
+                        </li>
+                        <li>
+                          <div class="collapsible-header truncate">2. How do I view and send chat messages?</div>
+                          <div class="collapsible-body"><p>Any player chat on the server is sent to the Chat tab. Any messages sent from here are broadcasted to the server.</p></div>
+                        </li>
+                        <li>
+                          <div class="collapsible-header truncate">3. Why can't I see any 'say' commands in the console?</div>
+                          <div class="collapsible-body"><p>All 'say' commands are automatically forwarded to the Chat tab for easier viewing.</p></div>
+                        </li>
+                        <li>
+                          <div class="collapsible-header truncate">4. How do I logout?</div>
+                          <div class="collapsible-body"><p>You can logout using the 'logout' link present in the top of the navigation bar or in the side navigation bar depending on the device you're browsing with.</p></div>
+                        </li>
+                    </ul>
+                  </div>
+                  <div class="col s12 m6">
+                    
+                  </div>
+                </div>
+            </div>
+        </div>
     </div>
-
   </main>
   
     <script>
@@ -149,6 +181,25 @@
         <input id="fileid" type="hidden">
         <div class="modal-footer" name="id">
           <a id="editsubmit" type="submit" name="submit" href="#" class="waves-effect waves-light btn modal-action modal-close">Update</a>
+        </div>
+     </div>
+   </div>
+   
+   <div id="accountmodal" class="modal">
+    <div class="modal-content">
+        <div class="row">
+          <div class="col s12 m6"><img id="accountmodalPicture" class="responsive-img"></div>
+          <div class="col s12 m6">
+            <ul class="collection with-header valign">
+                <li class="collection-header"><h4 id="accountmodalName"></h4></li>
+                <li class="collection-item truncate">Locale: <span class="badge" id="accountmodalLocale"></span></li>
+                <li class="collection-item truncate">ID: <span class="badge" id="accountmodalId"></span></li>
+            </ul>
+          </div>
+        </div>
+        <br>
+        <div class="modal-footer" name="id">
+          <a href="#" class="waves-effect waves-light btn modal-action red modal-close">Close</a>
         </div>
      </div>
    </div>

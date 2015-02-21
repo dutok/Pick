@@ -15,12 +15,15 @@ function runExample() {
     $('#button-console').click(pageConsole);
     $('#button-chat').click(pageChat);
     $('#button-dashboard').click(pageDashboard);
+    $('#button-support').click(pageSupport);
     $('#button-start').click(start);
     $('#button-stop').click(stop);
     $('#button-refresh').click(refresh);
     $('#editsubmit').click(updateFile);
+    $('#accountName').click(loadAccount);
     
     function showMain(){
+        loadDetails();
         loadConsole();
         loadConfigs();
         loadDashboard();
@@ -31,9 +34,25 @@ function runExample() {
            pageConsole();
         } else if(window.location.href.indexOf("chat") > -1) {
            pageChat();
+        } else if(window.location.href.indexOf("support") > -1) {
+            pageSupport();
         } else {
             pageDashboard();
         }
+    }
+    
+    function loadDetails() {
+        var token = null;
+        $.getJSON( "/token", function( data ) {
+            token = data.Token;
+            $.getJSON( "https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=" + token, function( data ) {
+                $('#accountName').append(data.name);
+                $('#accountmodalName').text(data.name);
+                $('#accountmodalLocale').text(data.locale);
+                $('#accountmodalId').text(data.id);
+                $("#accountmodalPicture").attr("src",data.picture);
+            });
+        });
     }
     
     function loadConsole() {
@@ -107,6 +126,14 @@ function runExample() {
         $('#button-dashboard').siblings().removeClass("active");
         
         loadDashboard();
+    }
+    
+    function pageSupport() {
+        $('#page-support').show();
+        $('#page-support').siblings().hide();
+        
+        $('#button-support').addClass("active");
+        $('#button-support').siblings().removeClass("active");
     }
     
     function launchUpload() {
@@ -211,6 +238,11 @@ function runExample() {
         $('#filetitle').text(name);
         $('#fileid').val(id);
         $('#filecontents').load("/config/" + id);
+    }
+    
+    function loadAccount() {
+        var $modal = $('#accountmodal')
+        $modal.openModal();
     }
     
     function updateFile() {

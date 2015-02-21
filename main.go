@@ -50,7 +50,7 @@ func httpServer(server *Server) {
 		ClientID:     "824000373870-148afj3scuj2fururtrn2ffn9vu48rfs.apps.googleusercontent.com",
 		ClientSecret: "tB9cqq53V1H0yXjsp1SGKcDv",
 		RedirectURL:  "http://dutok.koding.io/oauth2callback",
-		Scopes:       []string{"https://www.googleapis.com/auth/userinfo.email"},
+		Scopes:       []string{"https://www.googleapis.com/auth/userinfo.profile"},
 	}))
 	n.Use(gzip.Gzip(gzip.BestSpeed))
 

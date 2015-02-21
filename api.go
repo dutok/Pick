@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	noauth2 "github.com/goincremental/negroni-oauth2"
 	"github.com/gorilla/mux"
 	"io/ioutil"
 	"log"
@@ -9,6 +10,10 @@ import (
 	"strconv"
 	"strings"
 )
+
+type Token struct {
+	Token string
+}
 
 func loadRoutes(secureMux *mux.Router, server *Server) {
 	secureMux.HandleFunc("/sock", func(w http.ResponseWriter, r *http.Request) {
@@ -32,8 +37,23 @@ func loadRoutes(secureMux *mux.Router, server *Server) {
 	secureMux.HandleFunc("/server/start", func(w http.ResponseWriter, r *http.Request) {
 		start(w, r, server)
 	})
+	secureMux.HandleFunc("/token", func(w http.ResponseWriter, r *http.Request) {
+		getToken(w, r)
+	})
 
 	secureMux.PathPrefix("/").Handler(http.FileServer(http.Dir("public")))
+}
+
+func getToken(w http.ResponseWriter, r *http.Request) {
+	token := noauth2.GetToken(r)
+	tk := Token{token.Access()}
+	t, _ := json.Marshal(tk)
+	w.Header().Set("Content-Type", "application/json")
+	if token == nil || !token.Valid() {
+		w.Write([]byte("not logged in, or the access token is expired"))
+		return
+	}
+	w.Write([]byte(t))
 }
 
 func getConfigs(w http.ResponseWriter, r *http.Request) {

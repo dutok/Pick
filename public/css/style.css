@@ -68,6 +68,10 @@ ul.side-nav.fixed a:hover, ul.side-nav.fixed .active {
     background-color: #ddd;
 }
 
+ul.side-nav.fixed li:hover {
+    background-color: transparent;
+}
+
 ul.side-nav.fixed i {
     width: 2rem;
     font-size: 1.6rem;
