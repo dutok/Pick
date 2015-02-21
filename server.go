@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os/exec"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -23,6 +24,8 @@ type Server struct {
 	Messages   *[]string
 	Query      *mcgoquery.Client
 	Stats      *Stats
+	TPS        *string
+	StartTime  *int32
 }
 
 type MinecraftStats struct {
@@ -34,6 +37,8 @@ type MinecraftStats struct {
 	MaxPlayers int
 	NumPlayers int
 	Motd       string
+	Tps        *string
+	StartTime  *int32
 }
 
 type Stats struct {
@@ -43,6 +48,7 @@ type Stats struct {
 
 type ServerStats struct {
 	Memory sigar.Mem
+	CPU    float64
 }
 
 func newServer() Server {
@@ -59,7 +65,9 @@ func newServer() Server {
 	var stats Stats
 	status := 0
 	var messages []string
-	server := Server{&host, &queryport, command, &stdoutPipe, &stdinPipe, &status, cmdchan, &messages, &c, &stats}
+	var tps = ""
+	var starttime = int32(0)
+	server := Server{&host, &queryport, command, &stdoutPipe, &stdinPipe, &status, cmdchan, &messages, &c, &stats, &tps, &starttime}
 	return server
 }
 
@@ -103,6 +111,11 @@ func startServer(server *Server) {
 					broadcastMessage([]byte(str), server.Messages)
 					*server.Status = 1
 					log.Println("Minecraft server: Started")
+					*server.StartTime = int32(time.Now().Unix())
+				} else if strings.Contains(str, "TPS from last") {
+					output := str[len(str)-5:]
+					tps := strings.Trim(output, "\n")
+					*server.TPS = tps
 				} else {
 					broadcastMessage([]byte(str), server.Messages)
 				}
@@ -123,6 +136,7 @@ func queryTimer(server Server) {
 		for {
 			select {
 			case <-ticker.C:
+				server.sendCommand("tps")
 				updateStats(server)
 			}
 		}
@@ -141,6 +155,14 @@ func updateStats(server Server) {
 	mem := sigar.Mem{}
 	mem.Get()
 
+	idle0, total0 := getCPUSample()
+	time.Sleep(3 * time.Second)
+	idle1, total1 := getCPUSample()
+
+	idleTicks := float64(idle1 - idle0)
+	totalTicks := float64(total1 - total0)
+	cpu := 100 * (totalTicks - idleTicks) / totalTicks
+
 	var mcstats MinecraftStats
 
 	if stat != nil {
@@ -153,10 +175,13 @@ func updateStats(server Server) {
 			stat.MaxPlayers,
 			stat.NumPlayers,
 			stat.MOTD,
+			server.TPS,
+			server.StartTime,
 		}
 	}
 	ServerStats := ServerStats{
 		mem,
+		cpu,
 	}
 	*server.Stats = Stats{
 		mcstats,
@@ -195,4 +220,30 @@ func enableQuery() {
 		err = ioutil.WriteFile("server/server.properties", []byte(Value), 0644)
 		check(err, "Minecraft query")
 	}
+}
+
+func getCPUSample() (idle, total uint64) {
+	contents, err := ioutil.ReadFile("/proc/stat")
+	if err != nil {
+		return
+	}
+	lines := strings.Split(string(contents), "\n")
+	for _, line := range lines {
+		fields := strings.Fields(line)
+		if fields[0] == "cpu" {
+			numFields := len(fields)
+			for i := 1; i < numFields; i++ {
+				val, err := strconv.ParseUint(fields[i], 10, 64)
+				if err != nil {
+					log.Println("Error: ", i, fields[i], err)
+				}
+				total += val // tally up all the numbers to get total ticks
+				if i == 4 {  // idle is the 5th field in the cpu line
+					idle = val
+				}
+			}
+			return
+		}
+	}
+	return
 }

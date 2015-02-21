@@ -2,7 +2,7 @@ $(window).load(function(){
 function runExample() {
     "use strict";
     
-    var consoleSocket = null, timer = null;
+    var consoleSocket = null, timer = null, starttime = null;
     var $consoleinp = $('input[name=consoledata]');
     var $chatinp = $('input[name=chatdata]');
     var domain = window.location.hostname;
@@ -17,7 +17,7 @@ function runExample() {
     $('#button-dashboard').click(pageDashboard);
     $('#button-start').click(start);
     $('#button-stop').click(stop);
-    $('#button-refresh').click(refresh);
+    $('#button-refresh').click(loadDashboard);
     $('#editsubmit').click(updateFile);
     $('#accountName').click(loadAccount);
     
@@ -168,7 +168,7 @@ function runExample() {
         timer++;
         var resetat=30;
         if(timer == resetat){
-            refresh();
+            loadDashboard();
         }
         var tleft=resetat-timer;
         if (tleft === 0){
@@ -187,13 +187,6 @@ function runExample() {
         toast("Server stopped!", 4000);
     }
     
-    function refresh() {
-        loadDashboard();
-        if(window.location.href.indexOf("dashboard") > -1) {
-            toast("Dashboard refreshed!", 1000);
-        }
-    }
-    
     function loadDashboard() {
         $.getJSON( "/server", function( data ) {
           $('#playerbar').css("width", data.NumPlayers / data.MaxPlayers * 100 + "%");
@@ -203,11 +196,26 @@ function runExample() {
           $('#memorybar').css("width", data.Memory.Used / data.Memory.Total * 100 + "%");
           $('#memory').text(Math.floor(mempercent) + "% of RAM used");
           
+          $('#cpubar').css("width", Math.floor(data.CPU) + "%");
+          $('#cpu').text(Math.floor(data.CPU) + "% of CPU used");
+          
+          $('#tpsbar').css("width", Math.floor(data.Tps) / 20 * 100 + "%");
+          $('#tps').text(data.Tps + " ticks per second (TPS)");
+          
           $('#version').text(data.Version);
           $('#map').text(data.Map);
           $('#gameid').text(data.GameId);
           $('#gametype').text(data.GameType);
           $('#motd').text(data.Motd);
+          
+          if (data.Status === null || data.status === 0) {
+              $('#uptime').empty();
+          } else {
+              if (starttime != data.StartTime) {
+                starttime = data.StartTime;
+                $('#uptime').html("Started <span data-livestamp='"+ data.StartTime +"'></span>")
+              }
+          }
           
           if (data.Status === null || data.status === 0) {
             $('#statustext').text("Offline");

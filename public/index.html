@@ -57,33 +57,41 @@
             <div class="container">
                 <table>
                     <tr>
-                        <td>
-                            <h2>Dashboard</h2>
-                        </td>
-                        <td>
-                            <div class="right">
-                                <a href="https://www.minersplanet.com/portal/supporttickets.php"><i class="medium mdi-action-help"></i></a>
-                            </div>
-                        </td>
+                    <td>
+                        <h2>Dashboard</h2>
+                    </td>
+                    <td>
+                        <div class="right">
+                            <a href="https://www.minersplanet.com/portal/supporttickets.php"><i class="medium mdi-action-help"></i></a>
+                        </div>
+                    </td>
                 </table>
                 <div class="row">
                   <div class="col s12 m6">
                     <div class="card-panel teal">
                         <div class="card-content white-text">
-                          <span id="players" class="card-title flow-text"></span>
-                            <div class="progress">
-                                <div id="playerbar" class="determinate"></div>
-                            </div>
+                            <span id="players" class="card-title flow-text"></span>
+                                <div class="progress">
+                                    <div id="playerbar" class="determinate"></div>
+                                </div>
+                            <span id="tps" class="card-title flow-text"></span>
+                                <div class="progress">
+                                    <div id="tpsbar" class="determinate"></div>
+                                </div>
                         </div>
                     </div>
                   </div>
                   <div class="col s12 m6">
                     <div class="card-panel blue darken-2">
                         <div class="card-content white-text">
-                          <span id="memory" class="card-title flow-text"></span>
-                            <div class="progress">
-                                <div id="memorybar" class="determinate"></div>
-                            </div>
+                            <span id="memory" class="card-title flow-text"></span>
+                                <div class="progress">
+                                    <div id="memorybar" class="determinate"></div>
+                                </div>
+                            <span id="cpu" class="card-title flow-text"></span>
+                                <div class="progress">
+                                    <div id="cpubar" class="determinate"></div>
+                                </div>
                         </div>
                     </div>
                   </div>
@@ -109,7 +117,8 @@
                                 <div class="col s10 right-align">
                                   <span class="black-text">
                                     <p class="card-title flow-text">Server status: </p>
-                                    <p class="flow-text" id="statustext"></p>
+                                    <h5 id="statustext"></h5>
+                                    <h5 class="flow-text" id="uptime"></h5>
                                   </span>
                                 </div>
                             </div>
@@ -209,7 +218,7 @@
           <div class="col s12 m6"><img id="accountmodalPicture" class="responsive-img"></div>
           <div class="col s12 m6">
             <ul class="collection with-header">
-                <li class="collection-header truncat"><h4 id="accountmodalName"></h4></li>
+                <li class="collection-header truncate"><h4 id="accountmodalName"></h4></li>
                 <li class="collection-item truncate">Locale: <span class="badge" id="accountmodalLocale"></span></li>
                 <li class="collection-item truncate">ID: <span class="badge" id="accountmodalId"></span></li>
             </ul>
@@ -232,6 +241,8 @@
   <!--  Scripts-->
   <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.95.2/js/materialize.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.9.0/moment.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/livestamp/1.1.2/livestamp.min.js"></script>
   <script src="js/init.js"></script>
   <script type='text/javascript' src="app.js"></script>
 
