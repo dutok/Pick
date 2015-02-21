@@ -100,6 +100,7 @@ func setConfig(w http.ResponseWriter, r *http.Request) {
 	newcontent := strings.Replace(content, "&#47;", "/", -1)
 	err := ioutil.WriteFile(file, []byte(newcontent), 0644)
 	check(err, "HTTP server")
+	w.Header().Set("Content-Type", "text/plain")
 	w.Write([]byte("The file was updated successfully."))
 }
 

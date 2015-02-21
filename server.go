@@ -5,6 +5,7 @@ import (
 	"github.com/cloudfoundry/gosigar"
 	"github.com/lukevers/mcgoquery"
 	"io"
+	"io/ioutil"
 	"log"
 	"os/exec"
 	"strings"
@@ -67,8 +68,8 @@ func startServer(server *Server) {
 		server.Command.Process.Kill()
 	}
 	server.Command.Start()
-	log.Println("Minecraft server: STARTED")
-	*server.Status = 1
+	enableQuery()
+	log.Println("Minecraft server: Attempting to start")
 
 	go func() {
 		for {
@@ -98,6 +99,10 @@ func startServer(server *Server) {
 					} else {
 						log.Println(err)
 					}
+				} else if strings.Contains(str, "Done") && strings.Contains(str, "For help, type") {
+					broadcastMessage([]byte(str), server.Messages)
+					*server.Status = 1
+					log.Println("Minecraft server: Started")
 				} else {
 					broadcastMessage([]byte(str), server.Messages)
 				}
@@ -105,7 +110,7 @@ func startServer(server *Server) {
 		}
 		server.Command.Wait()
 		server.Command.Process.Release()
-		log.Println("Minecraft server: STOPPED")
+		log.Println("Minecraft server: Stopped")
 		*server.Status = 0
 	}()
 }
@@ -178,5 +183,16 @@ func (server *Server) connect() {
 	server.Query, err = mcgoquery.Create(*server.Host, *server.QueryPort)
 	if err != nil {
 		// Try reconnecting in 15 seconds
+	}
+}
+
+func enableQuery() {
+	read, err := ioutil.ReadFile("server/server.properties")
+	check(err, "Minecraft query")
+	if strings.Contains(string(read), "enable-query=false") {
+		r := string(read)
+		Value := strings.Replace(r, "enable-query=false", "enable-query=true", -1)
+		err = ioutil.WriteFile("server/server.properties", []byte(Value), 0644)
+		check(err, "Minecraft query")
 	}
 }

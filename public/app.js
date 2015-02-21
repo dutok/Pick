@@ -212,11 +212,9 @@ function runExample() {
           if (data.Status === null || data.status === 0) {
             $('#statustext').text("Offline");
             $('#status').addClass("red").removeClass("green");
-            $('#button-stop').addClass("disabled").removeClass("red").siblings().removeClass("disabled").addClass("white-text");
           } else {
              $('#statustext').text("Online");
              $('#status').addClass("green").removeClass("red");
-             $('#button-start').addClass("disabled").removeClass("green").siblings().removeClass("disabled").addClass("white-text");
           }
         });
     }
