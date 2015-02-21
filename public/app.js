@@ -211,10 +211,10 @@ function runExample() {
           
           if (data.Status === null || data.status === 0) {
             $('#statustext').text("Offline");
-            $('#status').addClass("red").removeClass("green");
+            $('#status').css("color", "#f44336")
           } else {
              $('#statustext').text("Online");
-             $('#status').addClass("green").removeClass("red");
+             $('#status').css("color", "#4CAF50")
           }
         });
     }
