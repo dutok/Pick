@@ -94,3 +94,17 @@ ul.side-nav.fixed i {
 .server-chat {
     color: #9e9e9e;
 }
+
+td {
+    width: 150px;
+    list-style-type: none;
+    padding: 0;
+}
+
+.left {
+    float: left;
+}
+
+.right {
+    float: right;
+}

@@ -15,7 +15,6 @@ function runExample() {
     $('#button-console').click(pageConsole);
     $('#button-chat').click(pageChat);
     $('#button-dashboard').click(pageDashboard);
-    $('#button-support').click(pageSupport);
     $('#button-start').click(start);
     $('#button-stop').click(stop);
     $('#button-refresh').click(refresh);
@@ -34,8 +33,6 @@ function runExample() {
            pageConsole();
         } else if(window.location.href.indexOf("chat") > -1) {
            pageChat();
-        } else if(window.location.href.indexOf("support") > -1) {
-            pageSupport();
         } else {
             pageDashboard();
         }
@@ -126,14 +123,6 @@ function runExample() {
         $('#button-dashboard').siblings().removeClass("active");
         
         loadDashboard();
-    }
-    
-    function pageSupport() {
-        $('#page-support').show();
-        $('#page-support').siblings().hide();
-        
-        $('#button-support').addClass("active");
-        $('#button-support').siblings().removeClass("active");
     }
     
     function launchUpload() {
