@@ -219,10 +219,10 @@ function runExample() {
           
           if (data.Status === null || data.status === 0) {
             $('#statustext').text("Offline");
-            $('#status').css("color", "#f44336")
+            $('#status').css("color", "#f44336").addClass("mdi-content-clear").removeClass("mdi-navigation-check");
           } else {
              $('#statustext').text("Online");
-             $('#status').css("color", "#4CAF50")
+             $('#status').css("color", "#4CAF50").addClass("mdi-navigation-check").removeClass("mdi-content-clear");
           }
         });
     }
