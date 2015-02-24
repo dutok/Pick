@@ -17,7 +17,7 @@ function runExample() {
     $('#button-dashboard').click(pageDashboard);
     $('#button-start').click(start);
     $('#button-stop').click(stop);
-    $('#button-refresh').click(loadDashboard);
+    $('#button-refresh').click(refresh);
     $('#editsubmit').click(updateFile);
     $('#accountName').click(loadAccount);
     
@@ -156,6 +156,11 @@ function runExample() {
             });
           });
         });
+    }
+    
+    function refresh() {
+        loadDashboard();
+        timer = 0;
     }
     
     function startTimer()
