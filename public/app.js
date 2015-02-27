@@ -2,7 +2,7 @@ $(window).load(function(){
 function runExample() {
     "use strict";
     
-    var consoleSocket = null, timer = null, starttime = null;
+    var consoleSocket = null, timer = null, starttime = null, prefix = "";
     var $consoleinp = $('input[name=consoledata]');
     var $chatinp = $('input[name=chatdata]');
     var domain = window.location.hostname;
@@ -22,7 +22,8 @@ function runExample() {
     $('#accountName').click(loadAccount);
     
     function showMain(){
-        loadDetails();
+        prefix = $('#at').text();
+        console.log(prefix);
         loadConsole();
         loadConfigs();
         loadDashboard();
@@ -38,25 +39,11 @@ function runExample() {
         }
     }
     
-    function loadDetails() {
-        var token = null;
-        $.getJSON( "/token", function( data ) {
-            token = data.Token;
-            $.getJSON( "https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=" + token, function( data ) {
-                $('#accountName').append(data.name);
-                $('#accountmodalName').text(data.name);
-                $('#accountmodalLocale').text(data.locale);
-                $('#accountmodalId').text(data.id);
-                $("#accountmodalPicture").attr("src",data.picture);
-            });
-        });
-    }
-    
     function loadConsole() {
         var $console = $('#console');
         var $chat = $('#chat');
         $console.empty();
-        consoleSocket = new WebSocket("ws://"+ domain +"/sock");
+        consoleSocket = new WebSocket("ws://"+ domain +"/" + prefix + "/sock");
         consoleSocket.onmessage = function (event) {
           newMessage(event.data);
         }
@@ -147,7 +134,7 @@ function runExample() {
     function loadConfigs() {
         var $files = $('#files');
         $files.empty();
-        $.getJSON( "/configs", function( data ) {
+        $.getJSON( "/" + prefix + "/configs", function( data ) {
           var items = [];
           $.each( data, function( key, val ) {
             $files.append("<li><div class='file-name collapsible-header flow-text truncate'><a class='file' id='file"+ key +"' href='#editor'><i class='mdi-editor-insert-drive-file'></i>"+ val +"</a></div></li>");
@@ -183,7 +170,7 @@ function runExample() {
     }
     
     function start() {
-        $.get( "/server/start", function( data ) {});
+        $.get( "/" + prefix + "/server/start", function( data ) {});
         toast("Server started!", 4000);
     }
     
@@ -193,7 +180,7 @@ function runExample() {
     }
     
     function loadDashboard() {
-        $.getJSON( "/server", function( data ) {
+        $.getJSON( "/" + prefix + "/server", function( data ) {
           $('#playerbar').css("width", data.NumPlayers / data.MaxPlayers * 100 + "%");
           $('#players').text(data.NumPlayers + "/" + data.MaxPlayers + " players online");
           
@@ -237,7 +224,7 @@ function runExample() {
         $modal.openModal();
         $('#filetitle').text(name);
         $('#fileid').val(id);
-        $('#filecontents').load("/config/" + id);
+        $('#filecontents').load("/" + prefix + "/config/" + id);
     }
     
     function loadAccount() {
@@ -249,7 +236,7 @@ function runExample() {
         var id = $('#fileid').val();
         var content = $('#filecontents').val();
         var newcontent = escape(content.replace(/\//g, "&#47;"));
-        var url = "/update/" + id + "/" + newcontent;
+        var url = "/" + prefix + "/update/" + id + "/" + newcontent;
         $.post( url, function( data ) {
           toast(data, 4000)
         });
