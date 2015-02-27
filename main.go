@@ -2,17 +2,22 @@ package main
 
 import (
 	"github.com/codegangsta/negroni"
-	oauth2 "github.com/goincremental/negroni-oauth2"
-	sessions "github.com/goincremental/negroni-sessions"
-	"github.com/goincremental/negroni-sessions/cookiestore"
 	"github.com/gorilla/mux"
 	"github.com/phyber/negroni-gzip/gzip"
 	"github.com/stretchr/graceful"
 	"github.com/unrolled/secure"
 	"time"
+	"net/http"
+	"os"
+	"html/template"
 )
 
+var at string
 var err error
+
+type Home struct {
+	AccessToken string
+}
 
 func main() {
 	loadConfig()
@@ -35,32 +40,32 @@ func httpServer(server *Server) {
 		ContentSecurityPolicy: "default-src 'self'",
 	})
 
+    at = os.Args[1]
+    
 	secureMux := mux.NewRouter()
-
-	loadRoutes(secureMux, server)
+    s := secureMux.PathPrefix("/" + at).Subrouter()
+    
+	loadRoutes(s, server)
+	
+	secureMux.HandleFunc("/" + at, rootHandler)
+	secureMux.PathPrefix("/static").Handler(http.StripPrefix("/static", http.FileServer(http.Dir("public"))))
 
 	secure := negroni.New()
-	secure.Use(oauth2.LoginRequired())
 	secure.UseHandler(secureMux)
 	secure.Use(negroni.HandlerFunc(secureMiddleware.HandlerFuncWithNext))
 
 	n := negroni.New()
-	n.Use(sessions.Sessions("my_session", cookiestore.New([]byte("secret123"))))
-	n.Use(oauth2.Google(&oauth2.Config{
-		ClientID:     "824000373870-148afj3scuj2fururtrn2ffn9vu48rfs.apps.googleusercontent.com",
-		ClientSecret: "tB9cqq53V1H0yXjsp1SGKcDv",
-		RedirectURL:  "http://dutok.koding.io/oauth2callback",
-		Scopes:       []string{"https://www.googleapis.com/auth/userinfo.profile"},
-	}))
 	n.Use(gzip.Gzip(gzip.BestSpeed))
 
-	router := mux.NewRouter()
-
-	//There is probably a nicer way to handle this than repeat the restricted routes again
-	//of course, you could use something like gorilla/mux and define prefix / regex etc.
-	router.PathPrefix("/").Handler(secure)
-
-	n.UseHandler(router)
+	n.UseHandler(secureMux)
 
 	graceful.Run(":80", 10*time.Second, n)
+}
+
+func rootHandler(w http.ResponseWriter, r *http.Request) {
+	t, _ := template.ParseFiles("public/index.html")
+	home := Home{
+		AccessToken: at,
+	}
+	t.Execute(w, home)
 }
