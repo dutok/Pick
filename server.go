@@ -52,7 +52,7 @@ type ServerStats struct {
 }
 
 func newServer() Server {
-	command := exec.Command("java", "-Xmx1024M", "-Xms1024M", "-jar", "minecraft_server.jar", "nogui")
+	command := exec.Command("java", "-Xmx512M", "-Xms512M", "-jar", "minecraft_server.jar", "nogui")
 	command.Dir = "server"
 	stdoutPipe, err := command.StdoutPipe()
 	check(err, "Minecraft server")
