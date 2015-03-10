@@ -22,8 +22,8 @@
         <a id="button-console" href="#console"><li><i id="icon-console" class="tiny mdi-av-subtitles"></i> Console</li></a>
         <a id="button-chat" href="#chat"><li><i id="icon-chat" class="tiny mdi-action-question-answer"></i> Chat</li></a>
         <a id="button-editor" href="#editor"><li><i id="icon-editor" class="mdi-file-folder"></i> File Editor</li></a>
-        <div class="divider"></div>
-        <a><li><i id="icon-editor" class="mdi-action-lock"></i> <span id="at" class="grey-text">{{.AccessToken}}</span></li></a>
+        <li class="divider"></li>
+        <a id="button-account" href="#"><li id="accountName"><i class="mdi-social-person"></i></li></a>
         <li class="hide-on-large-only"><a href="/logout">Logout</a></li>
       </ul>
       <a href="#" data-activates="slide-out" class="button-collapse">&nbsp; <i class="mdi-navigation-menu"></i></a>
@@ -189,7 +189,7 @@
         var h = document.getElementsByTagName('head')[0]; h.parentNode.insertBefore(l, h);
         
         var l = document.createElement('link'); l.rel = 'stylesheet';
-        l.href = 'static/css/style.css';
+        l.href = 'css/style.css';
         var h = document.getElementsByTagName('head')[0]; h.parentNode.insertBefore(l, h);
       };
       var raf = requestAnimationFrame || mozRequestAnimationFrame ||
@@ -243,10 +243,8 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.95.2/js/materialize.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.9.0/moment.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/livestamp/1.1.2/livestamp.min.js"></script>
-  <script>
-  </script>
-  <script src="static/js/init.js"></script>
-  <script type='text/javascript' src="static/app.js"></script>
+  <script src="js/init.js"></script>
+  <script type='text/javascript' src="app.js"></script>
 
   </body>
 </html>
