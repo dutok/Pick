@@ -22,7 +22,6 @@ function runExample() {
     $('#accountName').click(loadAccount);
     
     function showMain(){
-        loadDetails();
         loadConsole();
         loadConfigs();
         loadDashboard();
@@ -36,20 +35,6 @@ function runExample() {
         } else {
             pageDashboard();
         }
-    }
-    
-    function loadDetails() {
-        var token = null;
-        $.getJSON( "/token", function( data ) {
-            token = data.Token;
-            $.getJSON( "https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=" + token, function( data ) {
-                $('#accountName').append(data.name);
-                $('#accountmodalName').text(data.name);
-                $('#accountmodalLocale').text(data.locale);
-                $('#accountmodalId').text(data.id);
-                $("#accountmodalPicture").attr("src",data.picture);
-            });
-        });
     }
     
     function loadConsole() {
